@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="../scormdriver.js"></script>
+    <script src="../APIWrapper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Advanced — Capstone Project</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #2e7d32;
+            --bg: #f8f9fa;
+            --text-main: #202124;
+            --white: #ffffff;
+            --border: #e0e0e0;
+            --code-bg: #1e1e1e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Google Sans', Arial, sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+
+        .sidebar-header {
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Centers the logo horizontally */
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+}
+
+.sidebar-logo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-img {
+    width: 180px;      /* Adjust this width based on your PNG's dimensions */
+    height: auto;      /* Maintains aspect ratio */
+    display: block;
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1)); /* Optional: adds a soft shadow */
+}
+
+        .header { margin-bottom: 2rem; }
+        .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 4px; background: #e8f0fe; color: #1967d2; text-transform: uppercase; margin-bottom: 1rem; }
+        
+        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; margin-bottom: 2rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+
+        .challenge-card { background: var(--white); border-radius: 16px; padding: 2.5rem; border: 1px solid var(--border); display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .challenge-card.active { display: block; animation: fadeIn 0.4s ease; }
+
+        .editor-label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        textarea { width: 100%; height: 280px; background: var(--code-bg); color: #dcdcdc; padding: 1.5rem; border-radius: 8px; font-family: 'Courier New', monospace; border: none; outline: none; margin-bottom: 1.5rem; font-size: 0.9rem; border: 1px solid #333; }
+
+        .solution-area { display: none; background: #f1f8e9; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 8px; margin-top: 1rem; }
+        pre { white-space: pre-wrap; font-size: 0.85rem; margin-top: 10px; line-height: 1.5; font-family: 'Courier New', monospace; }
+
+        .nav-controls { display: flex; justify-content: space-between; margin-top: 2rem; }
+        button { padding: 12px 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s; }
+        .btn-submit { background: var(--primary); color: white; border: none; }
+        .btn-submit:hover { background: #174ea6; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
+    <div style="margin-top: 2rem;">
+        <p style="font-size: 0.8rem; text-transform: uppercase; color: #666;">Final Capstone</p>
+        <p style="font-weight: bold;">Enterprise Architecture</p>
+    </div>
+    <div style="margin-top: 2rem;">
+        <a href="../index.html" style="text-decoration:none; color:#5f6368; font-size:0.9rem;">← Exit to Dashboard</a>
+    </div>
+    <div style="margin-top: auto;">
+        <p id="prog-text" style="font-weight: bold; color: var(--primary);">0% COMPLETE</p>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <div class="badge">Module 3: Advanced</div>
+        <h1>Enterprise Dashboard Implementation</h1>
+        <p style="color: #5f6368;">Construct a high-performance, scalable React architecture.</p>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width: 0%"></div></div>
+    <div id="container"></div>
+
+    <div class="nav-controls">
+        <button id="prev-btn" onclick="nav(-1)" disabled>Previous Task</button>
+        <button id="sub-btn" class="btn-submit" onclick="submitCode()">Submit & Unlock Solution</button>
+        <button id="next-btn" onclick="nav(1)" style="display:none">Next Task</button>
+    </div>
+</div>
+
+<script>
+    // 1. GATEKEEPER: Ensure the user passed the Advanced Post-Assessment first
+    window.onload = function() {
+        const postDone = localStorage.getItem('react_adv_post_completed');
+        if (!postDone) {
+            alert("Access Denied: Please complete the Advanced React Assessment (Final Quiz) first.");
+            window.location.href = "adv_post_assessment.html";
+            return;
+        }
+        build(); // Initialize tasks if gatekeeper passes
+    };
+const DATA = [
+    {
+        t: "1. Redux Store Configuration",
+        d: "Configure a Redux store using <code>configureStore</code>. Must include a 'products' slice and use middleware for async actions.",
+        s: "import { configureStore } from '@reduxjs/toolkit';\nimport productReducer from './productSlice';\n\nexport const store = configureStore({\n  reducer: { products: productReducer }\n});"
+    },
+    {
+        t: "2. Async Thunk for Data Fetching",
+        d: "Create a <code>createAsyncThunk</code> named 'fetchProducts' to fetch from an API and handle the fulfilled state in extraReducers.",
+        s: "export const fetchProducts = createAsyncThunk('products/fetch', async () => {\n  const res = await fetch('/api/products');\n  return res.json();\n});"
+    },
+    {
+        t: "3. React Query: useQuery",
+        d: "Implement <code>useQuery</code> with a 5-minute 'staleTime' and handle the 'isLoading' state.",
+        s: "const { data, isLoading } = useQuery({\n  queryKey: ['products'],\n  queryFn: fetchProducts,\n  staleTime: 1000 * 60 * 5\n});"
+    },
+    {
+        t: "4. Next.js Dynamic Routing",
+        d: "Create a dynamic route for products and use <code>getStaticPaths</code> to pre-render product IDs.",
+        s: "export async function getStaticPaths() {\n  const paths = products.map(p => ({ params: { id: p.id } }));\n  return { paths, fallback: 'blocking' };\n}"
+    },
+    {
+        t: "5. Next.js: ISR Implementation",
+        d: "Implement <code>getStaticProps</code> with a revalidate interval of 60 seconds (Incremental Static Regeneration).",
+        s: "export async function getStaticProps({ params }) {\n  return { props: { data }, revalidate: 60 };\n}"
+    },
+    {
+        t: "6. Performance: Code Splitting",
+        d: "Use <code>React.lazy</code> and <code>Suspense</code> to dynamically load a heavy chart component.",
+        s: "const HeavyChart = React.lazy(() => import('./HeavyChart'));\n\n<Suspense fallback={<Loader />}><HeavyChart /></Suspense>"
+    },
+    {
+        t: "7. Custom Hook: useAnalytics",
+        d: "Create a hook that uses <code>useRouter</code> to log page views on route changes.",
+        s: "useEffect(() => {\n  router.events.on('routeChangeComplete', (url) => log(url));\n}, [router]);"
+    },
+    {
+        t: "8. Advanced Context + useReducer",
+        d: "Combine <code>useReducer</code> with Context API to manage a global notification system.",
+        s: "const [state, dispatch] = useReducer(reducer, []);\n<Context.Provider value={{ state, dispatch }}>{children}</Context.Provider>"
+    },
+    {
+        t: "9. Testing with RTL",
+        d: "Write a test using React Testing Library to find all list items after an async fetch.",
+        s: "test('renders items', async () => {\n  render(<App />);\n  const items = await screen.findAllByRole('listitem');\n  expect(items).toHaveLength(10);\n});"
+    },
+    {
+        t: "10. Compound Components",
+        d: "Implement a Tabs system using <code>React.cloneElement</code> to pass index props.",
+        s: "React.Children.map(children, (child, index) => {\n  return React.cloneElement(child, { index });\n});"
+    }
+];
+
+let cur = 0;
+function build() {
+    const c = document.getElementById('container');
+    DATA.forEach((item, i) => {
+        const d = document.createElement('div');
+        d.className = 'challenge-card' + (i === 0 ? ' active' : '');
+        d.id = 'c' + i;
+        d.innerHTML = `
+            <h3>${item.t}</h3>
+            <p style="margin: 1.5rem 0; font-size:1.1rem; line-height:1.6;">${item.d}</p>
+            <label class="editor-label">ENTERPRISE SOLUTION ARCHITECTURE</label>
+            <textarea id="area${i}" spellcheck="false" placeholder="// Write production-grade code..."></textarea>
+            <div class="solution-area" id="sol${i}">
+                <strong style="color:var(--success)">Advanced Technical Solution:</strong>
+                <pre>${item.s}</pre>
+                <div style="margin-top:15px; padding:12px; background:#fff; border:1px solid #ddd; border-radius:8px; font-size:0.9rem;">
+                    <strong>Design Principle:</strong> This architecture ensures scalability by separating server-state from UI logic.
+                </div>
+            </div>
+        `;
+        c.appendChild(d);
+    });
+}
+
+function submitCode() {
+    document.getElementById('sol' + cur).style.display = 'block';
+    document.getElementById('sub-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function nav(dir) {
+    document.getElementById('c' + cur).classList.remove('active');
+    cur += dir;
+    document.getElementById('c' + cur).classList.add('active');
+    
+    document.getElementById('prev-btn').disabled = (cur === 0);
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('sub-btn').style.display = 'block';
+    
+    const pct = Math.round((cur / (DATA.length - 1)) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-text').textContent = pct + '% COMPLETE';
+
+    if (cur === DATA.length - 1 && document.getElementById('sol'+cur).style.display === 'block') {
+        document.getElementById('next-btn').textContent = "Submit Capstone & Finalize SCORM";
+        document.getElementById('next-btn').onclick = () => {
+            
+            // --- SCORM FINAL REPORTING ---
+            if (typeof LMSSetValue === "function") {
+                LMSSetValue("cmi.core.score.raw", "100");
+                LMSSetValue("cmi.core.lesson_status", "passed");
+                LMSCommit();
+            }
+
+            alert("Advanced React Capstone Projects Completed! Status reported as PASSED to LMS.");
+            window.location.href = '../index.html';
+        };
+    }
+}
+window.onload = build;
+</script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="../scormdriver.js"></script>
+    <script src="../APIWrapper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Advanced — Post-Assessment</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #2e7d32;
+            --error: #c62828;
+            --bg: #f8f9fa;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --white: #ffffff;
+            --border: #e0e0e0;
+            --code-bg: #202124;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Google Sans', Roboto, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 1000px;
+            margin-left: 260px;
+        }
+
+        .header { margin-bottom: 2rem; }
+        .badge { 
+            display: inline-block; font-size: 11px; font-weight: bold; 
+            padding: 4px 12px; border-radius: 4px; 
+            background: #e8f0fe; color: #1967d2;
+            margin-bottom: 1rem;
+        }
+        h1 { font-size: 2rem; color: #174ea6; margin-bottom: 0.5rem; }
+        .subtitle { color: var(--text-sub); font-size: 0.95rem; }
+
+        .progress-container { margin-bottom: 2rem; }
+        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+
+        .qcard { 
+            background: var(--white); 
+            border-radius: 16px; 
+            padding: 2rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            display: none; 
+            border: 1px solid var(--border);
+        }
+        .qcard.active { display: block; animation: fadeIn 0.4s ease; }
+
+        .topic-label { 
+            font-size: 11px; font-weight: bold; color: var(--primary); 
+            text-transform: uppercase; margin-bottom: 0.5rem; display: block;
+        }
+        .qnum { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem; }
+        .qtext { font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.4; }
+
+        .code-block {
+            background: var(--code-bg); color: #dcdcdc; padding: 1rem;
+            border-radius: 8px; font-family: monospace;
+            font-size: 0.85rem; margin: 1rem 0; overflow-x: auto;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 0.8rem; }
+        .opt { 
+            display: flex; align-items: center; gap: 1rem; 
+            padding: 1rem; border-radius: 12px; 
+            border: 1px solid var(--border); 
+            cursor: pointer; transition: all 0.2s;
+        }
+        .opt:hover { background: #f1f3f4; border-color: var(--primary); }
+        .opt.selected { background: #e8f0fe; border-color: var(--primary); }
+        .olabel { 
+            width: 28px; height: 28px; border-radius: 50%; 
+            border: 1.5px solid #dadce0; display: flex; 
+            align-items: center; justify-content: center; font-size: 13px; font-weight: bold;
+        }
+        .opt.selected .olabel { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .nav-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
+        button { 
+            padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s;
+        }
+        button:hover:not(:disabled) { background: #f1f3f4; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-submit { background: var(--primary); color: white; border: none; }
+        .btn-submit:hover { background: #174ea6; }
+
+        .results-header { text-align: center; padding: 2rem; background: var(--white); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .score-big { font-size: 3rem; font-weight: bold; color: var(--primary); }
+        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--white); padding: 1.5rem; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        
+        .review-card { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 5px solid var(--border); }
+        .review-card.correct { border-left-color: var(--success); }
+        .review-card.incorrect { border-left-color: var(--error); }
+        .exp-box { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; color: var(--text-sub); }
+
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 50px; }
+        .sidebar-link { text-decoration: none; color: var(--text-sub); font-size: 0.9rem; transition: 0.2s; }
+        .sidebar-link:hover { color: var(--primary); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
+    <div style="margin-top: 2rem;">
+        <div class="subtitle" style="font-size: 0.8rem; text-transform: uppercase;">Time Elapsed</div>
+        <div id="qtimer" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">00:00</div>
+    </div>
+    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 10px;">
+        <a href="../index.html" class="sidebar-link">← Exit to Dashboard</a>
+    </div>
+    <div style="margin-top: auto;">
+        <div class="subtitle">Questions Answered</div>
+        <div id="ans-num" style="font-weight: bold;">0 / 20</div>
+    </div>
+</div>
+
+<div class="main-content">
+    <div id="quiz-ui">
+        <div class="header">
+            <div class="badge">Advanced Certification</div>
+            <h1>Advanced React Assessment</h1>
+            <p class="subtitle">Validate your mastery of architecture, global state, SSR, and performance optimization.</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%"></div></div>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <div class="nav-controls">
+            <button id="prev-btn" onclick="nav(-1)" disabled>Previous</button>
+            <div id="submit-row" style="display:none">
+                <button class="btn-submit" onclick="submitAssessment()">Submit Final Quiz</button>
+            </div>
+            <button id="next-btn" onclick="nav(1)">Next</button>
+        </div>
+    </div>
+
+    <div id="results" style="display:none"></div>
+</div>
+
+<script>
+    // 1. GATEKEEPER: Ensure Advanced Content was reviewed first
+window.onload = function() {
+    const contentDone = localStorage.getItem('react_adv_content_completed'); 
+    if (!contentDone) {
+        alert("Please review the Advanced Learning Materials before taking this Certification Quiz.");
+        window.location.href = "adv_content.html";
+        return;
+    }
+    buildQuestions();
+    startTimer();
+};
+const QS = [
+    {
+        topic: "Architecture",
+        q: "In a Redux architecture, which part is responsible for transforming the current state into a new state based on an action?",
+        opts: ["The Store", "The Dispatcher", "The Reducer", "The Selector"],
+        ans: 2,
+        exp: "Reducers are pure functions that take the current state and an action to return the next state, ensuring unidirectional and predictable data flow."
+    },
+    {
+        topic: "Next.js",
+        q: "You are building a blog that needs excellent SEO and fast initial page loads. Which Next.js strategy is best?",
+        opts: ["Client-Side Rendering (CSR)", "Server-Side Rendering (SSR) or SSG", "Local Storage persistence", "Prop Drilling"],
+        ans: 1,
+        exp: "Next.js supports SSR and Static Site Generation (SSG), which pre-renders HTML on the server, making it indexable by search engines."
+    },
+    {
+        topic: "Server State",
+        q: "Which React Query configuration ensures your data is refreshed automatically when a user returns to the browser tab?",
+        opts: ["staleTime: Infinity", "refetchOnWindowFocus: true", "cacheTime: 0", "enabled: false"],
+        ans: 1,
+        exp: "refetchOnWindowFocus is a core feature that keeps server state synchronized with the UI whenever the app regains focus."
+    },
+    {
+        topic: "Optimization",
+        q: "What is the primary difference between 'useMemo' and 'React.memo'?",
+        opts: ["One is for functions, one is for variables", "useMemo memoizes a value; React.memo memoizes a whole component", "They are identical", "useMemo is for Class components"],
+        ans: 1,
+        exp: "useMemo caches expensive calculations inside a component; React.memo is an HOC that prevents component re-renders if props don't change."
+    },
+    {
+        topic: "Testing",
+        q: "When testing a component, why is 'user-event' preferred over 'fireEvent' in React Testing Library?",
+        opts: ["It is faster to execute", "It more closely simulates real browser interactions (like focus and hover)", "It is built into the browser", "It does not require Jest"],
+        ans: 1,
+        exp: "user-event simulates full interactions, triggering all associated events rather than just the single event targeted by fireEvent."
+    },
+    {
+        topic: "Next.js Data",
+        q: "What does the following Next.js function do?",
+        code: "export async function getStaticProps() { ... }",
+        opts: ["Fetches data on every client-side click", "Fetches data at build time to generate static HTML", "Handles API POST requests", "Sets up a WebSocket connection"],
+        ans: 1,
+        exp: "getStaticProps allows you to fetch data during the build process, resulting in highly performant static pages."
+    },
+    {
+        topic: "State Management",
+        q: "Which state management library is known for its 'no-provider' approach and simpler API compared to Redux?",
+        opts: ["Context API", "Zustand", "Redux Toolkit", "MobX"],
+        ans: 1,
+        exp: "Zustand provides a minimalist, hook-based state management solution that doesn't require wrapping your app in providers."
+    },
+    {
+        topic: "Performance",
+        q: "What is 'Tree Shaking' in a production build process?",
+        opts: ["A way to organize file folders", "The removal of unused code from the final bundle to reduce size", "A method for testing deep trees", "A performance hook for animations"],
+        ans: 1,
+        exp: "Tree shaking is an optimization technique used by bundlers to eliminate dead code, ensuring only necessary logic is shipped."
+    },
+    {
+        topic: "Server State",
+        q: "In React Query, what does 'Stale Time' refer to?",
+        opts: ["Time before unmount", "Duration data is 'fresh' before a refetch is allowed", "Data fetch time", "UI delay"],
+        ans: 1,
+        exp: "Stale time determines how long the data remains valid in the cache before a background update is needed."
+    },
+    {
+        topic: "Testing",
+        q: "Which testing library is built into standard React environments by default?",
+        opts: ["Cypress", "Selenium", "Jest", "Playwright"],
+        ans: 2,
+        exp: "Jest is the default test runner and assertion library for most React projects."
+    },
+    {
+        topic: "Optimization",
+        q: "What is 'Code Splitting' primarily used for?",
+        opts: ["Formatting code", "Reducing initial load time by loading chunks on demand", "Securing API keys", "Syncing databases"],
+        ans: 1,
+        exp: "Code splitting breaks the bundle into smaller pieces to speed up initial site loading."
+    },
+    {
+        topic: "Advanced Hooks",
+        q: "Which hook provides a way to handle imperative handle methods with refs?",
+        opts: ["useRef", "useImperativeHandle", "useLayoutEffect", "useCallback"],
+        ans: 1,
+        exp: "useImperativeHandle customizes the instance value exposed to parent components when using refs."
+    },
+    {
+        topic: "Hydration",
+        q: "What is 'Hydration' in the context of SSR?",
+        opts: ["Cleaning code", "Attaching event listeners to static server HTML on the client", "Downloading images", "DB connecting"],
+        ans: 1,
+        exp: "Hydration turns static HTML from the server into an interactive React app on the client side."
+    },
+    {
+        topic: "Architecture",
+        q: "What is the 'Flux' architecture?",
+        opts: ["CSS Framework", "Unidirectional data flow pattern used by Redux", "Query language", "Browser engine"],
+        ans: 1,
+        exp: "Flux is the architecture Redux is based on, ensuring data flows in one consistent direction."
+    },
+    {
+        topic: "Redux",
+        q: "In Redux, what is the role of a 'Selector'?",
+        opts: ["To change the state", "To extract specific pieces of data from the store efficiently", "To trigger API calls", "To style components"],
+        ans: 1,
+        exp: "Selectors are used to query and derive specific data points from the global state store."
+    },
+    {
+        topic: "Concurrent",
+        q: "What does the 'Suspense' component allow you to do?",
+        opts: ["Stop the app", "Show a fallback while waiting for content/code to load", "Hide errors", "Delete state"],
+        ans: 1,
+        exp: "Suspense lets components 'wait' for something before rendering, typically used for lazy-loaded components."
+    },
+    {
+        topic: "Patterns",
+        q: "What is a 'Higher-Order Component' (HOC)?",
+        opts: ["List component", "Function taking a component and returning a new one", "Root component", "Prop component"],
+        ans: 1,
+        exp: "HOCs are advanced patterns for reusing component logic by wrapping components in functions."
+    },
+    {
+        topic: "Next.js",
+        q: "Which Next.js feature updates static content without a full rebuild?",
+        opts: ["SSR", "Incremental Static Regeneration (ISR)", "CSR", "Hydration"],
+        ans: 1,
+        exp: "ISR allows you to update specific static pages in the background after deployment without a full site rebuild."
+    },
+    {
+        topic: "Testing",
+        q: "What is the purpose of 'Mock Service Worker' (MSW)?",
+        opts: ["Deployment", "Intercepting and mocking API requests for reliable testing", "Speeding internet", "CSS management"],
+        ans: 1,
+        exp: "MSW mocks network requests to ensure tests are fast, reliable, and decoupled from actual server availability."
+    },
+    {
+        topic: "Lifecycle",
+        q: "Which hook is used to measure the layout of a DOM element synchronously?",
+        opts: ["useEffect", "useLayoutEffect", "useMemo", "useCallback"],
+        ans: 1,
+        exp: "useLayoutEffect runs synchronously after DOM updates to read layout values before the browser paints."
+    }
+];
+
+let current = 0, answered = {}, submitted = false;
+let timeLeft = 20 * 60; // 20 Minutes in seconds
+let timerInt;
+
+function buildQuestions(){
+    const c = document.getElementById('questions-container');
+    QS.forEach((q, i) => {
+        const d = document.createElement('div');
+        d.className = 'qcard' + (i === 0 ? ' active' : '');
+        d.id = 'q' + i;
+        d.innerHTML = `
+            <div class="topic-label">${q.topic}</div>
+            <div class="qnum">Task ${i + 1} of ${QS.length}</div>
+            <div class="qtext">${q.q}</div>
+            ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
+            <div class="options" id="opts${i}">
+                ${q.opts.map((o, j) => `
+                    <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
+                        <div class="olabel">${String.fromCharCode(65+j)}</div>
+                        <div class="otext">${o}</div>
+                    </div>`).join('')}
+            </div>`;
+        c.appendChild(d);
+    });
+}
+
+function selectOpt(qi, oi){
+    if (submitted) return;
+    answered[qi] = oi;
+    document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
+    document.getElementById('ans-num').textContent = `${Object.keys(answered).length} / ${QS.length}`;
+    document.getElementById('prog').style.width = Math.round((Object.keys(answered).length / QS.length) * 100) + '%';
+    
+    // Show submit button once all 20 questions are answered
+    if (Object.keys(answered).length === QS.length) document.getElementById('submit-row').style.display = 'block';
+}
+
+function nav(dir){
+    document.getElementById('q' + current).classList.remove('active');
+    current = Math.max(0, Math.min(QS.length - 1, current + dir));
+    document.getElementById('q' + current).classList.add('active');
+    document.getElementById('prev-btn').disabled = (current === 0);
+    document.getElementById('next-btn').disabled = (current === QS.length - 1);
+}
+
+function submitAssessment(){
+    if (submitted) return;
+    submitted = true; 
+    clearInterval(timerInt);
+    
+    // UNLOCK: Mark React Advanced Post-Assessment as complete to unlock the final lab
+    localStorage.setItem('react_adv_post_completed', 'true');
+    showResults();
+}
+
+function showResults(){
+    document.getElementById('quiz-ui').style.display = 'none';
+    const r = document.getElementById('results'); 
+    r.style.display = 'block';
+    
+    let correct = 0; 
+    QS.forEach((q, i) => { if (answered[i] === q.ans) correct++; });
+    const pct = Math.round((correct / QS.length) * 100);
+
+    const timeSpentSec = (20 * 60) - timeLeft;
+    const m = Math.floor(timeSpentSec / 60), s = timeSpentSec % 60;
+
+    r.innerHTML = `
+        <div class="results-header">
+            <h2 style="margin-bottom:10px">Certification Complete</h2>
+            <div class="score-big">${pct}%</div>
+            <p class="subtitle">${pct >= 70 ? 'Advanced Mastery Confirmed! Proceed to your final Capstone Project.' : 'High score achieved. Review technical context below before the project.'}</p>
+        </div>
+        <div class="result-grid">
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${correct}</div><div class="subtitle">Correct</div></div>
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${QS.length - correct}</div><div class="subtitle">Incorrect</div></div>
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${m}:${s < 10 ? '0' : ''}${s}</div><div class="subtitle">Duration</div></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-submit" onclick="window.location.href='../index.html'" style="background: var(--white); color: var(--primary); border: 1px solid var(--primary);">Return to Dashboard</button>
+            <button class="btn-submit" onclick="window.location.href='adv_assignment.html'">Final Capstone Project →</button>
+        </div>
+
+        <h3 style="margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Review Responses</h3>
+        ${QS.map((q, i) => {
+            const ua = answered[i]; const ok = ua === q.ans;
+            return `
+            <div class="review-card ${ok ? 'correct' : 'incorrect'}">
+                <div class="qnum">Question ${i + 1}</div>
+                <div style="font-weight:bold; margin-bottom:10px">${q.q}</div>
+                <div style="font-size:0.9rem">Selection: ${ua !== undefined ? q.opts[ua] : 'None'}</div>
+                ${!ok ? `<div style="font-size:0.9rem; color:var(--success); font-weight:bold">Correct: ${q.opts[q.ans]}</div>` : ''}
+                <div class="exp-box"><strong>Technical Context:</strong> ${q.exp}</div>
+            </div>`;
+        }).join('')}
+    `;
+}
+
+function startTimer(){
+    timerInt = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+        const display = document.getElementById('qtimer');
+        display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        if (timeLeft <= 60) display.style.color = "var(--error)";
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInt);
+            alert("Time's up! Submitting your final assessment.");
+            submitAssessment();
+        }
+    }, 1000);
+}
+</script>
+</body>
+</html>

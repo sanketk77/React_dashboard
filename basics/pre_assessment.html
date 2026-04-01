@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="scormdriver.js"></script>
+    <script src="APIWrapper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Basics — Pre-Assessment</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #2e7d32;
+            --error: #c62828;
+            --bg: #f8f9fa;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --white: #ffffff;
+            --border: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Google Sans', Roboto, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 1000px;
+            margin-left: 260px;
+        }
+
+        .header { margin-bottom: 2rem; }
+        .badge { 
+            display: inline-block;
+            font-size: 11px; font-weight: bold; 
+            padding: 4px 12px; border-radius: 4px; 
+            background: #e8f0fe; color: #1967d2;
+            margin-bottom: 1rem;
+        }
+        h1 { font-size: 2rem; color: #174ea6; margin-bottom: 0.5rem; }
+        .subtitle { color: var(--text-sub); font-size: 0.95rem; }
+
+        .progress-container { margin-bottom: 2rem; }
+        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+
+        .qcard { 
+            background: var(--white); 
+            border-radius: 16px; 
+            padding: 2rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            display: none; 
+            border: 1px solid var(--border);
+        }
+        .qcard.active { display: block; animation: fadeIn 0.4s ease; }
+
+        .topic-label { 
+            font-size: 11px; font-weight: bold; color: var(--primary); 
+            text-transform: uppercase; margin-bottom: 0.5rem; display: block;
+        }
+        .qnum { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem; }
+        .qtext { font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.4; }
+
+        .options { display: flex; flex-direction: column; gap: 0.8rem; }
+        .opt { 
+            display: flex; align-items: center; gap: 1rem; 
+            padding: 1rem; border-radius: 12px; 
+            border: 1px solid var(--border); 
+            cursor: pointer; transition: all 0.2s;
+        }
+        .opt:hover { background: #f1f3f4; border-color: var(--primary); }
+        .opt.selected { background: #e8f0fe; border-color: var(--primary); }
+        .olabel { 
+            width: 28px; height: 28px; border-radius: 50%; 
+            border: 1.5px solid #dadce0; display: flex; 
+            align-items: center; justify-content: center; font-size: 13px; font-weight: bold;
+        }
+        .opt.selected .olabel { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .nav-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
+        button { 
+            padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s;
+        }
+        button:hover:not(:disabled) { background: #f1f3f4; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-submit { background: var(--primary); color: white; border: none; }
+        .btn-submit:hover { background: #174ea6; }
+
+        .results-header { text-align: center; padding: 2rem; background: var(--white); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .score-big { font-size: 3rem; font-weight: bold; color: var(--primary); }
+        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--white); padding: 1.5rem; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        
+        .review-card { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 5px solid var(--border); }
+        .review-card.correct { border-left-color: var(--success); }
+        .review-card.incorrect { border-left-color: var(--error); }
+        .exp-box { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; color: var(--text-sub); }
+
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 50px; }
+        .sidebar-link { text-decoration: none; color: var(--text-sub); font-size: 0.9rem; transition: 0.2s; }
+        .sidebar-link:hover { color: var(--primary); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
+    <div style="margin-top: 2rem;">
+        <div class="subtitle" style="font-size: 0.8rem; text-transform: uppercase;">Time Elapsed</div>
+        <div id="qtimer" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">00:00</div>
+    </div>
+    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 10px;">
+        <a href="index.html" class="sidebar-link">← Exit to Dashboard</a>
+    </div>
+    <div style="margin-top: auto;">
+        <div class="subtitle">Questions Answered</div>
+        <div id="ans-num" style="font-weight: bold;">0 / 20</div>
+    </div>
+</div>
+
+<div class="main-content">
+    <div id="quiz-ui">
+        <div class="header">
+            <div class="badge">Module 2: React Basics</div>
+            <h1>Pre-Assessment</h1>
+            <p class="subtitle">This diagnostic helps us understand your starting point with React. Answer naturally based on what you know now.</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%"></div></div>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <div class="nav-controls">
+            <button id="prev-btn" onclick="nav(-1)" disabled>Previous</button>
+            <div id="submit-row" style="display:none">
+                <button class="btn-submit" onclick="submitAssessment()">Check My Results</button>
+            </div>
+            <button id="next-btn" onclick="nav(1)">Next</button>
+        </div>
+    </div>
+
+    <div id="results" style="display:none"></div>
+</div>
+
+<script>
+const QS = [
+    {
+        topic: "Foundations",
+        q: "What is React primarily used for?",
+        opts: ["Managing databases", "Building User Interfaces (UIs)", "Server-side hardware routing", "Data encryption"],
+        ans: 1,
+        exp: "React is a JavaScript library specifically for building user interfaces from small, reusable pieces called components."
+    },
+    {
+        topic: "SPA Concept",
+        q: "How does a Single Page Application (SPA) handle navigation differently than a traditional website?",
+        opts: ["It reloads the whole page every click", "It uses many HTML files", "It swaps only changed components without a page reload", "It only works on mobile devices"],
+        ans: 2,
+        exp: "In a React SPA, the browser loads one HTML file and React swaps components instantly, providing an app-like experience."
+    },
+    {
+        topic: "JSX Syntax",
+        q: "In JSX, which attribute is used instead of the standard HTML 'class'?",
+        opts: ["styleClass", "classID", "className", "elementClass"],
+        ans: 2,
+        exp: "Because 'class' is a reserved keyword in JavaScript, React uses 'className' for styling."
+    },
+    {
+        topic: "Components",
+        q: "What is a React Component?",
+        opts: ["A global variable", "A JavaScript function that returns JSX", "A type of CSS file", "A backend server folder"],
+        ans: 1,
+        exp: "A component is a reusable JavaScript function that returns HTML-like code (JSX)."
+    },
+    {
+        topic: "Core Concepts",
+        q: "How must a React Component's name always start?",
+        opts: ["With a dollar sign ($)", "With a lowercase letter", "With a Capital letter", "With an underscore (_)"],
+        ans: 2,
+        exp: "React component names must start with a Capital letter (e.g., <Button />) to distinguish them from standard HTML tags."
+    },
+    {
+        topic: "Props",
+        q: "What are 'Props' used for in React?",
+        opts: ["Storing data inside a component", "Passing data from a parent to a child component", "Styling the background of a page", "Connecting to a database"],
+        ans: 1,
+        exp: "Props act like function arguments; they are used to pass data down the component tree."
+    },
+    {
+        topic: "State",
+        q: "Which hook is used to manage data that changes over time within a component?",
+        opts: ["useEffect", "useRouter", "useState", "useData"],
+        ans: 2,
+        exp: "The useState hook allows you to track and update data that makes the component dynamic."
+    },
+    {
+        topic: "Interactivity",
+        q: "What happens when a component's 'State' changes?",
+        opts: ["The browser crashes", "The whole page reloads", "React automatically re-renders that component", "Nothing happens until you refresh"],
+        ans: 2,
+        exp: "React detects state changes and updates the UI automatically to reflect the new data."
+    },
+    {
+        topic: "Architecture",
+        q: "Which direction does data typically flow in a React application?",
+        opts: ["Bottom-up (Child to Parent)", "Circular", "Top-down (Parent to Child)", "Randomly"],
+        ans: 2,
+        exp: "React uses unidirectional data flow, making the app's behavior more predictable and easier to debug."
+    },
+    {
+        topic: "Lists",
+        q: "What is the purpose of the 'key' prop when rendering lists?",
+        opts: ["To set the font size", "To help React track which items changed or were removed", "To hide the list from the user", "To name the list"],
+        ans: 1,
+        exp: "Keys provide a unique identity to list items, allowing React to update the DOM efficiently."
+    },
+    {
+        topic: "Event Handling",
+        q: "What is the correct syntax for an onClick event in JSX?",
+        opts: ["onclick='handleClick()'", "onClick={handleClick}", "handleClick={onClick}", "on-click={handleClick()}"],
+        ans: 1,
+        exp: "In JSX, event handlers are passed as camelCase functions within curly braces rather than strings."
+    },
+    {
+        topic: "Hooks (useEffect)",
+        q: "When does a useEffect hook with an empty dependency array ([]) run?",
+        opts: ["On every re-render", "Only once, after the initial mount", "Every time props change", "Only when the component unmounts"],
+        ans: 1,
+        exp: "An empty array signifies no dependencies, causing the effect to run only once when the component first appears."
+    },
+    {
+        topic: "Virtual DOM",
+        q: "What is the primary performance benefit of the Virtual DOM?",
+        opts: ["It increases the internet speed", "It updates the entire browser page instantly", "It only updates the parts of the real DOM that actually changed", "It removes the need for JavaScript"],
+        ans: 2,
+        exp: "The Virtual DOM is a lightweight copy that React uses to calculate the most efficient way to update the actual UI."
+    },
+    {
+        topic: "JSX Rules",
+        q: "Which of the following is a strict rule when returning JSX from a component?",
+        opts: ["You must return at least 5 elements", "All tags must be lowercase", "JSX must be wrapped in a single parent element", "You cannot use variables inside JSX"],
+        ans: 2,
+        exp: "React components must return a single root element; if you have multiple siblings, they must be wrapped in a div or Fragment."
+    },
+    {
+        topic: "Conditional Rendering",
+        q: "What is the most common way to conditionally render an element in React?",
+        opts: ["Using an if-else tag", "Using the ternary operator (? :) or logical AND (&&)", "Using CSS display:none only", "Using a for loop"],
+        ans: 1,
+        exp: "React uses standard JavaScript logic like ternary operators to decide which JSX to display based on state."
+    },
+    {
+        topic: "Tooling",
+        q: "Which command is standard for starting a local development server in a modern React project (Vite)?",
+        opts: ["npm start", "npm build", "npm run dev", "npm serve"],
+        ans: 2,
+        exp: "Vite, the modern replacement for Create React App, uses 'npm run dev' to launch the local server."
+    },
+    {
+        topic: "Fragements",
+        q: "Why would you use a React Fragment (<>...</>) instead of a <div>?",
+        opts: ["To make the code run faster", "To group elements without adding extra nodes to the DOM", "To add background colors", "To connect to an API"],
+        ans: 1,
+        exp: "Fragments let you group a list of children without adding unnecessary wrappers that could break CSS layout."
+    },
+    {
+        topic: "Hooks Rules",
+        q: "Where are you allowed to call React Hooks?",
+        opts: ["Inside standard JavaScript loops", "Inside any function in your project", "Only at the top level of a function component", "Inside a nested if statement"],
+        ans: 2,
+        exp: "Hooks must be called at the top level of React functions to ensure they execute in the same order every render."
+    },
+    {
+        topic: "Forms",
+        q: "In a 'controlled component', how is the input value managed?",
+        opts: ["By the browser's internal memory", "By the React state (useState)", "By a direct database link", "By a CSS file"],
+        ans: 1,
+        exp: "Controlled components link the input's value to state, making the React component the single source of truth."
+    },
+    {
+        topic: "Ecosystem",
+        q: "Who developed and currently maintains React?",
+        opts: ["Google", "Microsoft", "Meta (formerly Facebook)", "Amazon"],
+        ans: 2,
+        exp: "React was created by Jordan Walke at Facebook and continues to be maintained by Meta and the open-source community."
+    }
+];
+
+let current = 0, answered = {}, submitted = false;
+let timeLeft = 20 * 60; // 20:00 Countdown
+let timerInt;
+
+function buildQuestions(){
+    const c = document.getElementById('questions-container');
+    QS.forEach((q, i) => {
+        const d = document.createElement('div');
+        d.className = 'qcard' + (i === 0 ? ' active' : '');
+        d.id = 'q' + i;
+        d.innerHTML = `
+            <div class="topic-label">${q.topic}</div>
+            <div class="qnum">Step ${i+1} of ${QS.length}</div>
+            <div class="qtext">${q.q}</div>
+            <div class="options" id="opts${i}">
+                ${q.opts.map((o, j) => `
+                    <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
+                        <div class="olabel">${String.fromCharCode(65+j)}</div>
+                        <div class="otext">${o}</div>
+                    </div>`).join('')}
+            </div>`;
+        c.appendChild(d);
+    });
+}
+
+function selectOpt(qi, oi){
+    if (submitted) return;
+    answered[qi] = oi;
+    document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
+    document.getElementById('ans-num').textContent = `${Object.keys(answered).length} / ${QS.length}`;
+    document.getElementById('prog').style.width = Math.round((Object.keys(answered).length / QS.length) * 100) + '%';
+    
+    // Show submit button once at least 15 questions are answered
+    if (Object.keys(answered).length >= 15) document.getElementById('submit-row').style.display = 'block';
+}
+
+function nav(dir){
+    document.getElementById('q' + current).classList.remove('active');
+    current = Math.max(0, Math.min(QS.length - 1, current + dir));
+    document.getElementById('q' + current).classList.add('active');
+    document.getElementById('prev-btn').disabled = (current === 0);
+    document.getElementById('next-btn').disabled = (current === QS.length - 1);
+}
+
+function submitAssessment(){
+    if (submitted) return;
+    submitted = true; 
+    clearInterval(timerInt);
+    
+    // UNLOCK: Mark React Pre-Assessment as complete
+    localStorage.setItem('react_pre_completed', 'true');
+    showResults();
+}
+
+function showResults(){
+    document.getElementById('quiz-ui').style.display = 'none';
+    const r = document.getElementById('results'); 
+    r.style.display = 'block';
+    
+    let correct = 0; 
+    QS.forEach((q, i) => { if (answered[i] === q.ans) correct++; });
+    const pct = Math.round((correct / QS.length) * 100);
+
+    const timeSpentSec = (20 * 60) - timeLeft;
+    const m = Math.floor(timeSpentSec / 60), s = timeSpentSec % 60;
+
+    r.innerHTML = `
+        <div class="results-header">
+            <h2 style="margin-bottom:10px">Assessment Complete</h2>
+            <div class="score-big">${pct}%</div>
+            <p class="subtitle">Diagnostic complete. React Learning Materials are now unlocked.</p>
+        </div>
+        <div class="result-grid">
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${correct}</div><div class="subtitle">Correct</div></div>
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${QS.length - correct}</div><div class="subtitle">Incorrect</div></div>
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${m}:${s < 10 ? '0' : ''}${s}</div><div class="subtitle">Time Taken</div></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-submit" onclick="window.location.href='content.html'">Go to Learning Content →</button>
+        </div>
+
+        <h3 style="margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Review Response Details</h3>
+        ${QS.map((q, i) => {
+            const ua = answered[i]; const ok = ua === q.ans;
+            return `
+            <div class="review-card ${ok ? 'correct' : 'incorrect'}">
+                <div class="qnum">Question ${i + 1}</div>
+                <div style="font-weight:bold; margin-bottom:10px">${q.q}</div>
+                <div style="font-size:0.9rem">Your Answer: ${ua !== undefined ? q.opts[ua] : 'None'}</div>
+                ${!ok ? `<div style="font-size:0.9rem; color:var(--success); font-weight:bold">Correct: ${q.opts[q.ans]}</div>` : ''}
+                <div class="exp-box">${q.exp}</div>
+            </div>`;
+        }).join('')}
+    `;
+}
+
+function startTimer(){
+    timerInt = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+        const display = document.getElementById('qtimer');
+        display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        if (timeLeft <= 60) display.style.color = "var(--error)";
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInt);
+            alert("Time's up! Submitting your answers.");
+            submitAssessment();
+        }
+    }, 1000);
+}
+
+window.onload = function(){ buildQuestions(); startTimer(); }
+</script>
+</body>
+</html>

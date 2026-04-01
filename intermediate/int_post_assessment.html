@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Intermediate — Post-Assessment</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #2e7d32;
+            --error: #c62828;
+            --bg: #f8f9fa;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --white: #ffffff;
+            --border: #e0e0e0;
+            --code-bg: #202124;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Google Sans', Roboto, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar-header {
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Centers the logo horizontally */
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+}
+
+.sidebar-logo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.logo-img {
+    width: 180px;      /* Adjust this width based on your PNG's dimensions */
+    height: auto;      /* Maintains aspect ratio */
+    display: block;
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1)); /* Optional: adds a soft shadow */
+}
+
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 1000px;
+            margin-left: 260px;
+        }
+
+        .header { margin-bottom: 2rem; }
+        .badge { 
+            display: inline-block; font-size: 11px; font-weight: bold; 
+            padding: 4px 12px; border-radius: 4px; 
+            background: #e8f0fe; color: #1967d2;
+            margin-bottom: 1rem;
+        }
+        h1 { font-size: 2rem; color: #174ea6; margin-bottom: 0.5rem; }
+        .subtitle { color: var(--text-sub); font-size: 0.95rem; }
+
+        .progress-container { margin-bottom: 2rem; }
+        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+
+        .qcard { 
+            background: var(--white); 
+            border-radius: 16px; 
+            padding: 2rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            display: none; 
+            border: 1px solid var(--border);
+        }
+        .qcard.active { display: block; animation: fadeIn 0.4s ease; }
+
+        .topic-label { 
+            font-size: 11px; font-weight: bold; color: var(--primary); 
+            text-transform: uppercase; margin-bottom: 0.5rem; display: block;
+        }
+        .qnum { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem; }
+        .qtext { font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.4; }
+
+        .code-block {
+            background: var(--code-bg); color: #dcdcdc; padding: 1rem;
+            border-radius: 8px; font-family: monospace;
+            font-size: 0.9rem; margin: 1rem 0; overflow-x: auto;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 0.8rem; }
+        .opt { 
+            display: flex; align-items: center; gap: 1rem; 
+            padding: 1rem; border-radius: 12px; 
+            border: 1px solid var(--border); 
+            cursor: pointer; transition: all 0.2s;
+        }
+        .opt:hover { background: #f1f3f4; border-color: var(--primary); }
+        .opt.selected { background: #e8f0fe; border-color: var(--primary); }
+        .olabel { 
+            width: 28px; height: 28px; border-radius: 50%; 
+            border: 1.5px solid #dadce0; display: flex; 
+            align-items: center; justify-content: center; font-size: 13px; font-weight: bold;
+        }
+        .opt.selected .olabel { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .nav-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
+        button { 
+            padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s;
+        }
+        button:hover:not(:disabled) { background: #f1f3f4; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-submit { background: var(--primary); color: white; border: none; }
+        .btn-submit:hover { background: #174ea6; }
+
+        .results-header { text-align: center; padding: 2rem; background: var(--white); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .score-big { font-size: 3rem; font-weight: bold; color: var(--primary); }
+        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--white); padding: 1.5rem; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        
+        .review-card { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 5px solid var(--border); }
+        .review-card.correct { border-left-color: var(--success); }
+        .review-card.incorrect { border-left-color: var(--error); }
+        .exp-box { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; color: var(--text-sub); }
+
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 50px; }
+        .sidebar-link { text-decoration: none; color: var(--text-sub); font-size: 0.9rem; transition: 0.2s; }
+        .sidebar-link:hover { color: var(--primary); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
+    <div style="margin-top: 2rem;">
+        <div class="subtitle" style="font-size: 0.8rem; text-transform: uppercase;">Time Elapsed</div>
+        <div id="qtimer" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">00:00</div>
+    </div>
+    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 10px;">
+        <a href="../index.html" class="sidebar-link">← Exit to Dashboard</a>
+    </div>
+    <div style="margin-top: auto;">
+        <div class="subtitle">Questions Answered</div>
+        <div id="ans-num" style="font-weight: bold;">0 / 20</div>
+    </div>
+</div>
+
+<div class="main-content">
+    <div id="quiz-ui">
+        <div class="header">
+            <div class="badge">Module 2: Advanced State</div>
+            <h1>Intermediate Final Assessment</h1>
+            <p class="subtitle">Validate your understanding of Context, Custom Hooks, and Performance Optimization[cite: 5, 28].</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%"></div></div>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <div class="nav-controls">
+            <button id="prev-btn" onclick="nav(-1)" disabled>Previous</button>
+            <div id="submit-row" style="display:none">
+                <button class="btn-submit" onclick="submitAssessment()">Submit Results</button>
+            </div>
+            <button id="next-btn" onclick="nav(1)">Next</button>
+        </div>
+    </div>
+
+    <div id="results" style="display:none"></div>
+</div>
+
+<script>
+// 1. GATEKEEPER: Ensure Intermediate Content was reviewed first
+window.onload = function() {
+    const contentDone = localStorage.getItem('react_basics_content_completed'); // Key from int_content.html
+    if (!contentDone) {
+        alert("Please complete the Intermediate Learning Materials before taking this Post-Assessment.");
+        window.location.href = "int_content.html";
+        return;
+    }
+    buildQuestions();
+    startTimer();
+};
+
+const QS = [
+    {
+        topic: "State Management",
+        q: "You have a theme color used in 15 different components. What is the most effective way to manage this without Prop Drilling?",
+        opts: ["Passing the color as a prop to every child", "Using the Context API (createContext/useContext)", "Storing it in a global CSS file only", "Hardcoding it in each component"],
+        ans: 1,
+        exp: "The Context API allows you to share data globally across the component tree without manually passing props through every level[cite: 779, 780]."
+    },
+    {
+        topic: "Custom Hooks",
+        q: "Analyze this code. What is the primary advantage of this implementation?",
+        code: "const [val, toggle] = useToggle(false);",
+        opts: ["It is a standard built-in hook", "It encapsulates reusable stateful logic for boolean toggles", "It handles DOM elements directly", "It is used only for CSS classes"],
+        ans: 1,
+        exp: "Custom Hooks allow you to extract and reuse stateful logic between components, improving code readability and maintainability[cite: 777, 778]."
+    },
+    {
+        topic: "Optimization",
+        q: "Which hook should you use to optimize an expensive calculation so it doesn't run on every re-render?",
+        opts: ["useCallback", "useMemo", "useRef", "useReducer"],
+        ans: 1,
+        exp: "useMemo caches the result of a calculation and only re-computes it when dependencies change, preventing performance bottlenecks[cite: 781, 783]."
+    },
+    {
+        topic: "Advanced State",
+        q: "In a complex form with 10+ fields, why might you choose useReducer over multiple useState calls?",
+        opts: ["To make the code run faster", "To centralize complex state transitions in one function", "Because useState cannot handle objects", "To automatically save data to local storage"],
+        ans: 1,
+        exp: "useReducer is ideal for complex state logic where the next state depends on the previous state or multiple sub-values[cite: 781, 782]."
+    },
+    {
+        topic: "DOM Interaction",
+        q: "You need to access a DOM element directly to focus a text input. Which hook is appropriate?",
+        opts: ["useState", "useEffect", "useRef", "useContext"],
+        ans: 2,
+        exp: "useRef returns a mutable ref object whose .current property can hold a direct reference to a DOM node[cite: 781]."
+    },
+    {
+        topic: "Server State",
+        q: "What is the primary benefit of using a library like React Query for data fetching?",
+        opts: ["It removes the need for component styles", "It handles caching, synchronization, and automated background updates", "It is required for the fetch() API to work", "It reduces the final bundle size"],
+        ans: 1,
+        exp: "React Query provides specialized tools for managing server state, including automatic caching and background synchronization[cite: 783, 784]."
+    },
+    {
+        topic: "Architecture",
+        q: "What is 'Memoization' in React?",
+        opts: ["A way to clear component cache", "Caching results to skip unnecessary work or re-renders", "A type of database indexing", "A method for writing JSX templates"],
+        ans: 1,
+        exp: "Memoization is a performance technique that stores the results of expensive operations to avoid repetitive work[cite: 781, 783]."
+    },
+    {
+        topic: "Frameworks",
+        q: "Which framework is commonly used for Server-Side Rendering (SSR) to improve SEO?",
+        opts: ["Vite", "Next.js", "Redux", "Zustand"],
+        ans: 1,
+        exp: "Next.js is the leading React framework for building full-stack applications with support for SSR and static site generation[cite: 785, 786]."
+    },
+    {
+        topic: "Event Handling",
+        q: "When passing a function as a prop to a memoized child component, which hook ensures the function reference remains the same between renders?",
+        opts: ["useMemo", "useCallback", "useRef", "useEffect"],
+        ans: 1,
+        exp: "useCallback memoizes the function itself, preventing child components from re-rendering unnecessarily when the parent's state changes."
+    },
+    {
+        topic: "Component Patterns",
+        q: "What is 'Prop Drilling' specifically?",
+        opts: ["A way to inject CSS into HTML", "The process of passing props through multiple nested components that do not need them", "A method for drilling into a database", "A technique for performance testing"],
+        ans: 1,
+        exp: "Prop drilling makes code harder to maintain; it is often solved by using Context API or global state management[cite: 779, 780]."
+    },
+    {
+        topic: "Advanced Hooks",
+        q: "What is the correct way to trigger a specific state change in a useReducer pattern?",
+        opts: ["state.value = newValue", "updateReducer(newValue)", "dispatch({ type: 'ACTION_NAME', payload: data })", "setState(reducer(data))"],
+        ans: 2,
+        exp: "Dispatching actions is the only way to trigger a state update in useReducer, keeping state transitions predictable[cite: 781, 782]."
+    },
+    {
+        topic: "Lifecycle Management",
+        q: "Which hook should be used for operations that must happen synchronously after all DOM mutations, such as measuring layout?",
+        opts: ["useEffect", "useLayoutEffect", "useCallback", "useSyncState"],
+        ans: 1,
+        exp: "useLayoutEffect runs synchronously after DOM updates but before the browser paints, making it perfect for UI measurements."
+    },
+    {
+        topic: "Performance",
+        q: "React.memo() is used to wrap a component. When will this component re-render?",
+        opts: ["Whenever the parent re-renders", "Only when its props change", "Every 5 seconds automatically", "Only when the browser is refreshed"],
+        ans: 1,
+        exp: "React.memo is a higher-order component that skips rendering a component if its props have not changed[cite: 783]."
+    },
+    {
+        topic: "Global State",
+        q: "In a Redux Toolkit slice, what logic determines how the state changes in response to an action?",
+        opts: ["The Provider", "The Selector", "The Reducer", "The Middleware"],
+        ans: 2,
+        exp: "Reducers are pure functions that take the current state and an action to return a new state[cite: 781, 782]."
+    },
+    {
+        topic: "Testing",
+        q: "Which library is recommended for testing React components by simulating real user interactions?",
+        opts: ["Jest", "React Testing Library", "Redux DevTools", "ESLint"],
+        ans: 1,
+        exp: "React Testing Library encourages testing components as a user would, ensuring better accessibility and reliability[cite: 787, 788]."
+    },
+    {
+        topic: "Custom Logic",
+        q: "Why should a custom hook's name always start with the word 'use'?",
+        opts: ["To make it easier to find in a search", "To allow React to check for violations of the Rules of Hooks", "Because the browser requires it", "To differentiate it from a CSS module"],
+        ans: 1,
+        exp: "The 'use' prefix is a convention that allows linting tools to ensure hooks are called correctly within components[cite: 777, 778]."
+    },
+    {
+        topic: "Fragments",
+        q: "What is the primary benefit of using a React Fragment (<>...</>) over a <div>?",
+        opts: ["It adds extra styling options", "It allows you to group multiple elements without adding an extra node to the DOM", "It makes the code execute faster", "It is required for every component"],
+        ans: 1,
+        exp: "Fragments prevent 'div soup' and keep the DOM tree lean by grouping children without an unnecessary wrapper[cite: 769]."
+    },
+    {
+        topic: "Controlled Components",
+        q: "In an intermediate-level React application, where should the 'Single Source of Truth' for form data reside?",
+        opts: ["In the browser's URL", "In the local DOM elements", "In the React state (useState or useReducer)", "In the global CSS file"],
+        ans: 2,
+        exp: "Controlled components ensure that form data is managed by React state, making it easy to validate and manipulate[cite: 770]."
+    },
+    {
+        topic: "Context API",
+        q: "What happens to components consuming a Context when the Context Provider's value changes?",
+        opts: ["They are deleted", "They automatically re-render with the new value", "Nothing happens until a manual refresh", "They only update if they use props"],
+        ans: 1,
+        exp: "Components using useContext are automatically kept in sync with the latest value provided by the nearest Context Provider[cite: 779, 780]."
+    },
+    {
+        topic: "Architecture",
+        q: "What is the role of 'Selectors' in state management (like Redux or Zustand)?",
+        opts: ["To update the database", "To efficiently extract and compute derived data from the global state", "To choose which CSS file to load", "To select the next component to render"],
+        ans: 1,
+        exp: "Selectors provide a way to access specific pieces of state, often including memoization to prevent unnecessary re-calculations[cite: 781, 782]."
+    }
+];
+let current = 0, answered = {}, submitted = false;
+let timeLeft = 20 * 60; // 20 Minutes in seconds
+let timerInt;
+
+function buildQuestions(){
+    const c = document.getElementById('questions-container');
+    QS.forEach((q, i) => {
+        const d = document.createElement('div');
+        d.className = 'qcard' + (i === 0 ? ' active' : '');
+        d.id = 'q' + i;
+        d.innerHTML = `
+            <div class="topic-label">${q.topic}</div>
+            <div class="qnum">Question ${i + 1} of ${QS.length}</div>
+            <div class="qtext">${q.q}</div>
+            ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
+            <div class="options" id="opts${i}">
+                ${q.opts.map((o, j) => `
+                    <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
+                        <div class="olabel">${String.fromCharCode(65+j)}</div>
+                        <div class="otext">${o}</div>
+                    </div>`).join('')}
+            </div>`;
+        c.appendChild(d);
+    });
+}
+
+function selectOpt(qi, oi){
+    if (submitted) return;
+    answered[qi] = oi;
+    document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
+    document.getElementById('ans-num').textContent = `${Object.keys(answered).length} / ${QS.length}`;
+    document.getElementById('prog').style.width = Math.round((Object.keys(answered).length / QS.length) * 100) + '%';
+    
+    // Show submit button once all 20 questions are answered
+    if (Object.keys(answered).length === QS.length) document.getElementById('submit-row').style.display = 'block';
+}
+
+function nav(dir){
+    document.getElementById('q' + current).classList.remove('active');
+    current = Math.max(0, Math.min(QS.length - 1, current + dir));
+    document.getElementById('q' + current).classList.add('active');
+    document.getElementById('prev-btn').disabled = (current === 0);
+    document.getElementById('next-btn').disabled = (current === QS.length - 1);
+}
+
+function submitAssessment(){
+    if (submitted) return;
+    submitted = true; 
+    clearInterval(timerInt);
+    
+    // UNLOCK: Mark React Intermediate Post-Assessment as complete to unlock project
+    localStorage.setItem('react_int_post_completed', 'true');
+    showResults();
+}
+
+function showResults(){
+    document.getElementById('quiz-ui').style.display = 'none';
+    const r = document.getElementById('results'); 
+    r.style.display = 'block';
+    
+    let correct = 0; 
+    QS.forEach((q, i) => { if (answered[i] === q.ans) correct++; });
+    const pct = Math.round((correct / QS.length) * 100);
+
+    const timeSpentSec = (20 * 60) - timeLeft;
+    const m = Math.floor(timeSpentSec / 60), s = timeSpentSec % 60;
+
+    r.innerHTML = `
+        <div class="results-header">
+            <h2 style="margin-bottom:10px">Assessment Complete</h2>
+            <div class="score-big">${pct}%</div>
+            <p class="subtitle">${pct >= 70 ? 'Well done! You have unlocked the Practical Coding Assignment.' : 'Review the feedback below to prepare for the practical lab.'}</p>
+        </div>
+        <div class="result-grid">
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${correct}</div><div class="subtitle">Correct</div></div>
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${QS.length - correct}</div><div class="subtitle">Incorrect</div></div>
+            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${m}:${s < 10 ? '0' : ''}${s}</div><div class="subtitle">Duration</div></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-submit" onclick="window.location.href='../index.html'" style="background: var(--white); color: var(--primary); border: 1px solid var(--primary);">Return to Dashboard</button>
+            <button class="btn-submit" onclick="window.location.href='int_assignment.html'">Go to Practical Assignment →</button>
+        </div>
+
+        <h3 style="margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Review Responses</h3>
+        ${QS.map((q, i) => {
+            const ua = answered[i]; const ok = ua === q.ans;
+            return `
+            <div class="review-card ${ok ? 'correct' : 'incorrect'}">
+                <div class="qnum">Question ${i + 1}</div>
+                <div style="font-weight:bold; margin-bottom:10px">${q.q}</div>
+                <div style="font-size:0.9rem">Your Answer: ${ua !== undefined ? q.opts[ua] : 'None'}</div>
+                ${!ok ? `<div style="font-size:0.9rem; color:var(--success); font-weight:bold">Correct: ${q.opts[q.ans]}</div>` : ''}
+                <div class="exp-box"><strong>Technical Logic:</strong> ${q.exp}</div>
+            </div>`;
+        }).join('')}
+    `;
+}
+
+function startTimer(){
+    timerInt = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+        const display = document.getElementById('qtimer');
+        display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        if (timeLeft <= 60) display.style.color = "var(--error)";
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInt);
+            alert("Time's up! Submitting your final assessment.");
+            submitAssessment();
+        }
+    }, 1000);
+}
+</script>
+</body>
+</html>
+

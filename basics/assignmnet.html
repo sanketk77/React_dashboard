@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="../scormdriver.js"></script>
+    <script src="../APIWrapper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Basics — Task Manager Project</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #2e7d32;
+            --bg: #f8f9fa;
+            --text-main: #202124;
+            --white: #ffffff;
+            --border: #e0e0e0;
+            --code-bg: #1e1e1e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Google Sans', Roboto, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 3rem;
+            max-width: 1000px;
+            margin-left: 280px;
+        }
+
+        .header { margin-bottom: 2rem; }
+        .badge { 
+            display: inline-block; font-size: 11px; font-weight: bold; 
+            padding: 4px 12px; border-radius: 4px; 
+            background: #e8f0fe; color: #1967d2;
+            margin-bottom: 1rem; text-transform: uppercase;
+        }
+
+        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; margin-bottom: 2rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+
+        .challenge-card { 
+            background: var(--white); border-radius: 16px; padding: 2rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: none; border: 1px solid var(--border);
+        }
+        .challenge-card.active { display: block; animation: fadeIn 0.4s ease; }
+
+        .editor-label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        textarea {
+            width: 100%; height: 220px; background: var(--code-bg); color: #dcdcdc;
+            padding: 1rem; border-radius: 8px; font-family: 'Courier New', monospace;
+            border: none; outline: none; resize: vertical; margin-bottom: 1.5rem;
+        }
+
+        .solution-box {
+            display: none; background: #f1f8e9; border-left: 5px solid var(--success);
+            padding: 1.5rem; border-radius: 8px; margin-top: 1rem; animation: slideDown 0.3s ease;
+        }
+
+        .nav-controls { display: flex; justify-content: space-between; margin-top: 2rem; }
+        button { padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: 500; }
+        .btn-submit { background: var(--primary); color: white; border: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
+    <div style="margin-top: 2rem;">
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: #5f6368;">Project</div>
+        <div style="font-weight: bold;">Task Manager App</div>
+    </div>
+    <div style="margin-top: 2rem;">
+        <a href="../index.html" style="text-decoration:none; color:#5f6368; font-size:0.9rem;">← Back to Dashboard</a>
+    </div>
+    <div style="margin-top: auto;">
+        <div id="status-text" style="font-size: 0.8rem; font-weight: bold; color: var(--primary);">0% COMPLETE</div>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <div class="badge">Practical Project</div>
+        <h1>Building a React Task Manager</h1>
+        <p style="color: #5f6368;">Implement the core logic for a list-based application using React Foundations.</p>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%"></div></div>
+
+    <div id="challenges-container"></div>
+
+    <div class="nav-controls">
+        <button id="prev-btn" onclick="nav(-1)" disabled>Previous Task</button>
+        <button id="submit-btn" class="btn-submit" onclick="showSolution()">Submit & View Solution</button>
+        <button id="next-btn" onclick="nav(1)" style="display:none">Next Task</button>
+    </div>
+</div>
+
+<script>
+const CHALLENGES = [
+    {
+        title: "1. Create the App Component",
+        task: "Define a functional component named 'TaskManager' that returns a div containing an h1 with the text 'My Tasks'.",
+        sol: "const TaskManager = () => {\n  return (\n    <div>\n      <h1>My Tasks</h1>\n    </div>\n  );\n};",
+        desc: "Every React app starts with a root component that returns JSX."
+    },
+    {
+        title: "2. Initialize Task State",
+        task: "Use the <code>useState</code> hook to create a 'tasks' array. Initialize it with two strings: 'Learn React' and 'Build App'.",
+        sol: "const [tasks, setTasks] = useState(['Learn React', 'Build App']);",
+        desc: "State allows components to remember data between renders."
+    },
+    {
+        title: "3. Render a List",
+        task: "Use the <code>.map()</code> method to loop through the 'tasks' state and render an <code><li></code> for each task inside a <code><ul></code>.",
+        sol: "<ul>\n  {tasks.map((task, index) => (\n    <li key={index}>{task}</li>\n  ))}\n</ul>",
+        desc: "The 'key' prop is required when rendering lists to help React track items."
+    },
+    {
+        title: "4. Create an Input State",
+        task: "Create a new state variable named 'input' using <code>useState</code> to track the text typed into a new task field.",
+        sol: "const [input, setInput] = useState('');",
+        desc: "Controlled components link input values to React state."
+    },
+    {
+        title: "5. Handle Input Changes",
+        task: "Write a function <code>handleChange</code> that updates the 'input' state whenever a user types in the text box.",
+        sol: "const handleChange = (e) => {\n  setInput(e.target.value);\n};",
+        desc: "Event handlers capture user interactions to update state."
+    },
+    {
+        title: "6. Add Task Logic",
+        task: "Write an <code>addTask</code> function that takes the current 'input' and adds it to the 'tasks' array, then clears the input.",
+        sol: "const addTask = () => {\n  setTasks([...tasks, input]);\n  setInput('');\n};",
+        desc: "Never mutate state directly; always create a new array using the spread operator."
+    },
+    {
+        title: "7. Attach the Event Handler",
+        task: "Create a <code><button></code> that calls the <code>addTask</code> function when clicked.",
+        sol: "<button onClick={addTask}>Add Task</button>",
+        desc: "onClick triggers functions in response to user clicks."
+    },
+    {
+        title: "8. Conditional Empty State",
+        task: "Use a ternary operator to show 'No tasks found' if the tasks array is empty.",
+        sol: "{tasks.length === 0 ? <p>No tasks found</p> : <TaskList /> }",
+        desc: "Conditional rendering allows UI to adapt based on data presence."
+    },
+    {
+        title: "9. Pass Props to Sub-component",
+        task: "Create a component 'TaskItem' and pass a 'title' prop to it from the parent TaskManager.",
+        sol: "<TaskItem title={task} />\n\nconst TaskItem = (props) => <li>{props.title}</li>;",
+        desc: "Props are used to pass data from parent to child components."
+    },
+    {
+        title: "10. Implementation of Fragments",
+        task: "Wrap your task input and list in a React Fragment to avoid extra div nodes in the DOM.",
+        sol: "return (\n  <>\n    <input />\n    <ul>{/* list */}</ul>\n  </>\n);",
+        desc: "Fragments group elements without adding extra nodes to the HTML tree."
+    }
+];
+
+let current = 0;
+
+function build() {
+    const container = document.getElementById('challenges-container');
+    CHALLENGES.forEach((c, i) => {
+        const div = document.createElement('div');
+        div.className = 'challenge-card' + (i === 0 ? ' active' : '');
+        div.id = 'c' + i;
+        div.innerHTML = `
+            <h2>${c.title}</h2>
+            <p style="margin: 1.5rem 0; font-size: 1.1rem; line-height: 1.6;">${c.task}</p>
+            <label class="editor-label">YOUR CODE SOLUTION</label>
+            <textarea id="code${i}" spellcheck="false" placeholder="// Implement React basic logic here..."></textarea>
+            <div class="solution-box" id="sol${i}">
+                <strong style="color:var(--success)">Official Solution & Logic:</strong>
+                <pre style="margin-top:10px; font-family: 'Courier New', monospace; font-size: 0.9rem;">${c.sol}</pre>
+                <div style="margin-top:15px; padding:10px; background:#fff; border:1px solid #ddd; border-radius:6px; font-size:0.9rem;">
+                    <strong>Logic Tip:</strong> ${c.desc}
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function showSolution() {
+    document.getElementById('sol' + current).style.display = 'block';
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function nav(dir) {
+    document.getElementById('c' + current).classList.remove('active');
+    current += dir;
+    document.getElementById('c' + current).classList.add('active');
+    
+    document.getElementById('prev-btn').disabled = (current === 0);
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('submit-btn').style.display = 'block';
+    
+    const prog = Math.round((current / (CHALLENGES.length - 1)) * 100);
+    document.getElementById('prog').style.width = prog + '%';
+    document.getElementById('status-text').textContent = prog + '% COMPLETE';
+
+    if (current === CHALLENGES.length - 1 && document.getElementById('sol'+current).style.display === 'block') {
+        document.getElementById('next-btn').textContent = "Complete Assignment";
+        document.getElementById('next-btn').onclick = () => {
+            localStorage.setItem('react_basics_assign_completed', 'true');
+            alert("Basics Module Project Completed!");
+            window.location.href = '../index.html';
+        };
+    }
+}
+
+window.onload = function() {
+    // 1. Ensure Post-Assessment (Final Assessment) was passed first
+    const postDone = localStorage.getItem('react_basics_post_completed');
+    if (!postDone) {
+        alert("Access Denied: Please complete the React Basics Final Assessment first.");
+        window.location.href = "post_assessment.html";
+        return;
+    }
+    build(); // Only run the project lab if the gatekeeper passes
+};
+</script>
+</body>
+</html>
