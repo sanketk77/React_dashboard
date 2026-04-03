@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React Foundations — Learning Materials</title>
+    <title>React Advanced — Learning Materials</title>
 
     <style>
         :root {
-            /* Foundations Level Theme: Blue */
+            /* Advanced Level Theme: Red */
             --primary: #1a73e8;
             --primary-light: #e8f0fe;
             --primary-dark: #1557b0;
@@ -18,6 +18,7 @@
             --text-light: #80868b;
             --border: #dadce0;
             --success: #1e8e3e;
+            --error: #d32f2f;
             --shadow: 0 2px 8px rgba(0,0,0,0.1);
             --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
         }
@@ -39,6 +40,27 @@
             display: flex;
             min-height: 100vh;
         }
+
+        /* ===== LOCK OVERLAY ===== */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .lock-card {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: var(--shadow-lg); max-width: 450px; border: 1px solid var(--border);
+        }
+
+        .lock-icon { font-size: 64px; margin-bottom: 20px; }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
@@ -151,13 +173,13 @@
             font-weight: 700;
             padding: 6px 14px;
             border-radius: 20px;
-            background: linear-gradient(135deg, var(--primary-light) 0%, #d2e3fc 100%);
+            background: linear-gradient(135deg, var(--primary-light) 0%, #ffcdd2 100%);
             color: var(--primary);
             margin-bottom: 16px;
             display: inline-block;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
+            box-shadow: 0 2px 4px rgba(211, 47, 47, 0.1);
         }
 
         .header h1 {
@@ -210,7 +232,7 @@
         .mode-btn.active {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
         }
 
         .mode-btn.active::after {
@@ -236,25 +258,13 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ===== CARD ===== */
@@ -308,7 +318,7 @@
         .learning-objectives {
             margin-top: 24px;
             padding: 20px;
-            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f7ff 100%);
+            background: linear-gradient(135deg, var(--primary-light) 0%, #fff3e0 100%);
             border-radius: 12px;
             border-left: 4px solid var(--primary);
         }
@@ -422,12 +432,12 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4);
+            box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
         }
 
         .btn-primary:active {
@@ -450,91 +460,43 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 260px;
-            }
-
-            .main-content {
-                margin-left: 260px;
-                padding: 30px;
-            }
-
-            .header h1 {
-                font-size: 28px;
-            }
-
-            .pdf-container {
-                height: 800px;
-            }
+            .sidebar { width: 260px; }
+            .main-content { margin-left: 260px; padding: 30px; }
+            .header h1 { font-size: 28px; }
+            .pdf-container { height: 800px; }
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                z-index: 1000;
-                width: 100%;
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .mode-selector {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .mode-btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .pdf-container {
-                height: 600px;
-            }
-
-            .footer-nav {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+            .sidebar { transform: translateX(-100%); z-index: 1000; width: 100%; transition: transform 0.3s ease; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .header h1 { font-size: 24px; }
+            .mode-selector { width: 100%; flex-direction: column; }
+            .mode-btn { width: 100%; justify-content: center; }
+            .pdf-container { height: 600px; }
+            .footer-nav { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
         }
 
         /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-light);
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
     </style>
 </head>
 
 <body>
+
+<div id="lock-screen">
+    <div class="lock-card">
+        <div class="lock-icon">🔒</div>
+        <h2 style="margin-bottom: 12px; color: var(--text-main);">Module Locked</h2>
+        <p style="color: var(--text-sub); margin-bottom: 24px; line-height: 1.5;">Please complete the <b>Advanced Pre-Assessment</b> before accessing the learning materials.</p>
+        <button class="btn btn-primary" onclick="window.location.href='adv_pre_assessment.html'" style="margin: 0 auto 12px auto; display: block; width: 100%; justify-content: center;">Take Pre-Assessment</button>
+        <button onclick="window.location.href='index.html'" style="margin: 0 auto; display: block; background: transparent; color: var(--text-sub); border: none; box-shadow: none; font-size: 13px; cursor: pointer;">← Back to Dashboard</button>
+    </div>
+</div>
 
 <div class="sidebar">
     <div class="sidebar-header">
@@ -545,12 +507,12 @@
 
     <div class="sidebar-content">
         <div class="level-info">
-            <div class="level-label">Track Progress</div>
-            <div class="level-name">1. React Foundations</div>
+            <div class="level-label">Final Stage</div>
+            <div class="level-name">React.js Advanced Module</div>
         </div>
 
         <nav class="sidebar-nav">
-            <a href="../index.html">← Back to Dashboard</a>
+            <a href="index.html">← Back to Dashboard</a>
         </nav>
     </div>
 </div>
@@ -558,19 +520,19 @@
 <div class="main-content">
 
     <div class="header">
-        <div class="badge">📚 Learning Module</div>
-        <h1>Foundations of React.js</h1>
-        <p>An introductory deep-dive into Component-based Architecture and UI logic.</p>
+        <div class="badge">🚀 Module 3: Enterprise Patterns</div>
+        <h1>Advanced Architecture</h1>
+        <p>Mastering Next.js, Redux, and Enterprise-grade Testing.</p>
     </div>
 
     <div class="mode-selector">
-        <button class="mode-btn active" onclick="switchMode('video', this)">🎥 Watch Lecture</button>
-        <button class="mode-btn" onclick="switchMode('ppt', this)">📄 Technical Slides</button>
+        <button class="mode-btn active" onclick="switchMode('video', this)">🎥 Recorded Session</button>
+        <button class="mode-btn" onclick="switchMode('ppt', this)">📄 PPT Only</button>
     </div>
 
     <div id="video-content" class="content-area active">
         <div class="card">
-            <h3>🎥 Session 01: Core Curriculum</h3>
+            <h3>📹 Advanced Lecture: Enterprise Architecture</h3>
             <div class="video-wrapper">
                 <video controls crossorigin="anonymous">
                     <source src="https://res.cloudinary.com/dj3shi5ju/video/upload/v1774863371/uemx7jw5jftvmilzpejj.mp4" type="video/mp4">
@@ -581,10 +543,10 @@
             <div class="learning-objectives">
                 <strong>Learning Objectives</strong>
                 <ul>
-                    <li><strong>JSX Fundamentals:</strong> Writing HTML-like syntax within JavaScript.</li>
-                    <li><strong>Component Architecture:</strong> Building modular, reusable UI pieces.</li>
-                    <li><strong>Props & State:</strong> Managing data flow and component memory.</li>
-                    <li><strong>Virtual DOM:</strong> Understanding React's efficient rendering engine.</li>
+                    <li><strong>Next.js & SSR:</strong> Implementing Server-Side Rendering and Incremental Static Regeneration (ISR).</li>
+                    <li><strong>State Orchestration:</strong> Managing complex data flows with Redux Toolkit and React Query.</li>
+                    <li><strong>Performance at Scale:</strong> Advanced code-splitting and tree-shaking strategies.</li>
+                    <li><strong>Automated Testing:</strong> Unit and Integration testing using Jest and React Testing Library.</li>
                 </ul>
             </div>
         </div>
@@ -592,11 +554,11 @@
 
     <div id="ppt-content" class="content-area">
         <div class="card">
-            <h3>📊 Technical Slides: React Foundations</h3>
+            <h3>📊 Technical Slides: Advanced Architecture</h3>
             <div class="pdf-container">
                 <div class="pdf-loading">Loading slides...</div>
                 <iframe 
-                    src="https://drive.google.com/file/d/155f7TIP8112NeLmoj9O1RVgDtsiFcCU8/preview"
+                    src="https://drive.google.com/file/d/1b0oSZU1GC4-IVIhO78amRS0uJxoH7vjM/preview" 
                     title="Technical Slides PDF"
                     loading="lazy">
                 </iframe>
@@ -605,48 +567,47 @@
     </div>
 
     <div class="footer-nav">
-        <a href="pre_assessment.html" class="btn btn-outline">← Review Pre-Assessment</a>
-        <button class="btn btn-primary" onclick="markComplete()">Mark Content as Finished →</button>
+        <a href="index.html" class="btn btn-outline">← Back</a>
+        <button class="btn btn-primary" onclick="markComplete()">Mark as Completed →</button>
     </div>
 
 </div>
 
 <script>
-    // 1. GATEKEEPER: Ensure the user completed the React Pre-Assessment first
-    window.onload = function() {
-        const preDone = localStorage.getItem('react_pre_completed');
+    // ==========================================
+    // 1. STRICT AUTO-REDIRECT GATEKEEPER 
+    // Uses DOMContentLoaded to run instantly before assets load
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", function() {
+        const preDone = localStorage.getItem('react_adv_pre_completed');
         if (!preDone) {
-            alert("Please complete the React Pre-Assessment before accessing the learning materials.");
-            window.location.href = "pre_assessment.html";
-            return;
+            // Instantly hide the main UI and show the lock screen
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('lock-screen').style.display = 'flex';
+            
+            // Alert and Redirect
+            alert("🔒 Access Denied: Please complete the Advanced Pre-Assessment before accessing these materials.");
+            window.location.href = "adv_pre_assessment.html";
         }
-    };
+    });
 
     // 2. Tab Switching Logic (Video vs Slides)
     function switchMode(mode, btn) {
-        // Remove active from all buttons
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        // Hide all content areas
         document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
-        
-        // Show selected content area
         document.getElementById(mode + '-content').classList.add('active');
     }
 
-    // 3. Mark Complete and Unlock the Final Quiz
+    // 3. Mark Complete and Unlock the Final Certification Exam
     function markComplete() {
-        // Set the flag for React Content completion
-        localStorage.setItem('react_basics_content_completed', 'true'); 
-        
-        alert("Content marked as complete! The Final Quiz is now unlocked.");
-        
-        // Navigate to the React Final Assessment (Post-Assessment)
-        window.location.href = 'post_assessment.html';
+        localStorage.setItem('react_adv_content_completed', 'true'); 
+        alert("Advanced content marked as complete! The Certification Exam is now unlocked.");
+        window.location.href = 'adv_post_assessment.html';
     }
 
-    // Hide loading message when PDF loads
+    // 4. Hide loading message when PDF loads
     document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             const loader = document.querySelector('.pdf-loading');

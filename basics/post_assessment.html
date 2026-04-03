@@ -5,174 +5,374 @@
     <script src="../APIWrapper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React Basics — Final Assessment</title>
+    <title>React Basics — Post-Assessment</title>
     <style>
         :root {
             --primary: #1a73e8;
-            --success: #2e7d32;
-            --error: #c62828;
+            --primary-light: #e8f0fe;
+            --primary-dark: #1557b0;
+            --success: #1e8e3e;
+            --success-light: #f1f8e9;
+            --error: #d32f2f;
+            --error-light: #ffebee;
             --bg: #f8f9fa;
+            --bg-light: #ffffff;
             --text-main: #202124;
             --text-sub: #5f6368;
-            --white: #ffffff;
-            --border: #e0e0e0;
-            --code-bg: #202124;
+            --text-light: #80868b;
+            --border: #dadce0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        html, body {
+            height: 100%;
+        }
+
         body { 
-            font-family: 'Google Sans', Roboto, Arial, sans-serif; 
-            background: var(--bg); 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f8 100%);
             color: var(--text-main);
             display: flex;
             min-height: 100vh;
         }
 
+        /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 260px;
-            background: var(--white);
+            width: 280px;
+            background: var(--bg-light);
             border-right: 1px solid var(--border);
-            padding: 2rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            padding: 0;
             position: fixed;
             height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
         }
 
+        .sidebar-header {
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .sidebar-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo-img {
+            width: 160px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar-content {
+            padding: 30px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .timer-section {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f7ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .timer-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .timer-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s ease;
+        }
+
+        .timer-value.warning { color: #f57c00; }
+        .timer-value.critical { color: var(--error); animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        .answered-section {
+            background: linear-gradient(135deg, var(--success-light) 0%, #f1f8e9 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+        }
+
+        .answered-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .answered-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .sidebar-nav {
+            margin-top: auto;
+            padding-bottom: 20px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            transform: translateX(-4px);
+        }
+
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
-            padding: 3rem;
-            max-width: 1000px;
-            margin-left: 260px;
+            margin-left: 280px;
+            padding: 40px;
+            overflow-y: auto;
+            max-width: 900px;
         }
 
-        .header { margin-bottom: 2rem; }
-        .badge { 
+        .header {
+            margin-bottom: 40px;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .badge {
             display: inline-block;
-            font-size: 11px; font-weight: bold; 
-            padding: 4px 12px; border-radius: 4px; 
-            background: #e8f0fe; color: #1967d2;
-            margin-bottom: 1rem;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #d2e3fc 100%);
+            color: var(--primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
         }
-        h1 { font-size: 2rem; color: #174ea6; margin-bottom: 0.5rem; }
-        .subtitle { color: var(--text-sub); font-size: 0.95rem; }
 
-        .progress-container { margin-bottom: 2rem; }
-        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
 
-        .qcard { 
-            background: var(--white); 
-            border-radius: 16px; 
-            padding: 2rem; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-            display: none; 
+        .header p {
+            font-size: 16px;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container { margin-bottom: 40px; }
+        .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .progress-label { font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .progress-percentage { font-size: 13px; font-weight: 700; color: var(--primary); }
+
+        .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* ===== QUESTION CARD ===== */
+        .qcard {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            display: none;
             border: 1px solid var(--border);
-        }
-        .qcard.active { display: block; animation: fadeIn 0.4s ease; }
-
-        .topic-label { 
-            font-size: 11px; font-weight: bold; color: var(--primary); 
-            text-transform: uppercase; margin-bottom: 0.5rem; display: block;
-        }
-        .qnum { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem; }
-        .qtext { font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.4; }
-
-        .code-snippet {
-            background: var(--code-bg); color: #dcdcdc; padding: 1rem;
-            border-radius: 8px; font-family: 'Courier New', monospace;
-            font-size: 0.9rem; margin-bottom: 1.5rem; overflow-x: auto;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            animation: fadeIn 0.4s ease;
         }
 
-        .options { display: flex; flex-direction: column; gap: 0.8rem; }
-        .opt { 
-            display: flex; align-items: center; gap: 1rem; 
-            padding: 1rem; border-radius: 12px; 
-            border: 1px solid var(--border); 
-            cursor: pointer; transition: all 0.2s;
+        .qcard.active { display: flex; }
+        .topic-label { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: block; }
+        .qnum { font-size: 13px; color: var(--text-light); font-weight: 600; margin-bottom: 16px; }
+        .qtext { font-size: 20px; font-weight: 600; color: var(--text-main); margin-bottom: 0; line-height: 1.5; letter-spacing: -0.3px; }
+
+        /* ===== OPTIONS ===== */
+        .options { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+        .opt {
+            display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+            border-radius: 12px; border: 2px solid var(--border); cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg-light);
+            position: relative; overflow: hidden;
         }
-        .opt:hover { background: #f1f3f4; border-color: var(--primary); }
-        .opt.selected { background: #e8f0fe; border-color: var(--primary); }
-        .olabel { 
-            width: 28px; height: 28px; border-radius: 50%; 
-            border: 1.5px solid #dadce0; display: flex; 
-            align-items: center; justify-content: center; font-size: 13px; font-weight: bold;
+
+        .opt:hover { border-color: var(--primary); background: var(--primary-light); transform: translateX(4px); }
+        .opt.selected { background: var(--primary-light); border-color: var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
+
+        .olabel {
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            font-weight: 700; color: var(--text-main); background: var(--bg); flex-shrink: 0;
         }
+
         .opt.selected .olabel { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .nav-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
-        button { 
-            padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
-            background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s;
-        }
-        button:hover:not(:disabled) { background: #f1f3f4; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-submit { background: var(--primary); color: white; border: none; }
-        .btn-submit:hover { background: #174ea6; }
+        /* ===== CONTROLS ===== */
+        .nav-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+        button { padding: 12px 28px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-light); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-submit { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; font-weight: 700; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); }
 
-        .results-header { text-align: center; padding: 2rem; background: var(--white); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .score-big { font-size: 3rem; font-weight: bold; color: var(--primary); }
-        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--white); padding: 1.5rem; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+        /* ===== RESULTS ===== */
+        #results { display: none; animation: fadeIn 0.5s ease; }
+        .results-header { text-align: center; padding: 40px; background: var(--bg-light); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 32px; }
+        .score-big { font-size: 56px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 32px 0; }
+        .stat-card { background: var(--bg-light); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); }
         
-        .review-card { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 5px solid var(--border); }
+        .review-card { background: var(--bg-light); border-radius: 12px; padding: 20px; margin-bottom: 16px; border-left: 5px solid var(--border); box-shadow: var(--shadow); }
         .review-card.correct { border-left-color: var(--success); }
         .review-card.incorrect { border-left-color: var(--error); }
-        .exp-box { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; color: var(--text-sub); }
-
-        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 50px; }
-        .sidebar-link { text-decoration: none; color: var(--text-sub); font-size: 0.9rem; transition: 0.2s; }
-        .sidebar-link:hover { color: var(--primary); }
+        .exp-box { background: rgba(0,0,0,0.03); padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px; color: var(--text-sub); border-left: 3px solid var(--primary); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: static; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .nav-controls { flex-direction: column; }
+            button { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
-    <div style="margin-top: 2rem;">
-        <div class="subtitle" style="font-size: 0.8rem; text-transform: uppercase;">Time Elapsed</div>
-        <div id="qtimer" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">00:00</div>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <img src="jade_logo.webp" alt="Jade Global Logo" class="logo-img">
+        </div>
     </div>
-    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 10px;">
-        <a href="../index.html" class="sidebar-link">← Exit to Dashboard</a>
-    </div>
-    <div style="margin-top: auto;">
-        <div class="subtitle">Questions Answered</div>
-        <div id="ans-num" style="font-weight: bold;">0 / 8</div>
+    <div class="sidebar-content">
+        <div class="timer-section">
+            <div class="timer-label">⏱ Time Remaining</div>
+            <div id="qtimer" class="timer-value">20:00</div>
+        </div>
+        <div class="answered-section">
+            <div class="answered-label">✓ Answered</div>
+            <div class="answered-count" id="ans-num">0 / 20</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../index.html">← Exit to Dashboard</a>
+        </nav>
     </div>
 </div>
 
 <div class="main-content">
     <div id="quiz-ui">
         <div class="header">
-            <div class="badge">Module 1-5: Certification</div>
-            <h1>React Basics Final Assessment</h1>
-            <p class="subtitle">Demonstrate your mastery of React foundations including state, props, and lifecycle[cite: 766].</p>
+            <div class="badge">Certification Module</div>
+            <h1>Final Assessment</h1>
+            <p>Demonstrate your mastery of React foundations including state, props, and lifecycle.</p>
         </div>
 
         <div class="progress-container">
+            <div class="progress-info">
+                <span class="progress-label">Progress</span>
+                <span class="progress-percentage" id="prog-text">0%</span>
+            </div>
             <div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%"></div></div>
         </div>
 
         <div id="questions-container"></div>
 
         <div class="nav-controls">
-            <button id="prev-btn" onclick="nav(-1)" disabled>Previous</button>
+            <button id="prev-btn" onclick="nav(-1)" disabled>← Previous</button>
             <div id="submit-row" style="display:none">
-                <button class="btn-submit" onclick="submitAssessment()">Submit Assessment</button>
+                <button class="btn-submit" onclick="submitAssessment()">Submit for Grading →</button>
             </div>
-            <button id="next-btn" onclick="nav(1)">Next</button>
+            <button id="next-btn" onclick="nav(1)">Next →</button>
         </div>
     </div>
-
-    <div id="results" style="display:none"></div>
+    <div id="results"></div>
 </div>
 
 <script>
+// ==========================================
+// 1. GATEKEEPER: Ensure Content is completed
+// ==========================================
+window.onload = function() {
+    // Check if the learning material was completed
+    const contentDone = localStorage.getItem('react_basics_content_completed'); 
+    
+    if (!contentDone) {
+        alert("🔒 Access Denied: Please complete the React Foundations Learning Materials before taking this Final Assessment.");
+        window.location.href = "content.html"; // Redirects back to the content page
+        return; // Stops the quiz from building
+    }
+    
+    // If unlocked, build the quiz and start the timer
+    buildQuestions();
+    startTimer();
+};
+
 const QS = [
     {
         topic: "General Knowledge",
@@ -317,7 +517,7 @@ const QS = [
 ];
 
 let current = 0, answered = {}, submitted = false;
-let timeLeft = 20 * 60; // 20:00 Countdown
+let timeLeft = 20 * 60;
 let timerInt;
 
 function buildQuestions(){
@@ -327,9 +527,11 @@ function buildQuestions(){
         d.className = 'qcard' + (i === 0 ? ' active' : '');
         d.id = 'q' + i;
         d.innerHTML = `
-            <div class="topic-label">${q.topic}</div>
-            <div class="qnum">Step ${i+1} of ${QS.length}</div>
-            <div class="qtext">${q.q}</div>
+            <div class="qcard-header">
+                <div class="topic-label">📌 ${q.topic}</div>
+                <div class="qnum">Question ${i+1} of ${QS.length}</div>
+                <div class="qtext">${q.q}</div>
+            </div>
             <div class="options" id="opts${i}">
                 ${q.opts.map((o, j) => `
                     <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
@@ -345,9 +547,12 @@ function selectOpt(qi, oi){
     if (submitted) return;
     answered[qi] = oi;
     document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
-    document.getElementById('ans-num').textContent = `${Object.keys(answered).length} / ${QS.length}`;
-    document.getElementById('prog').style.width = Math.round((Object.keys(answered).length / QS.length) * 100) + '%';
-    if (Object.keys(answered).length >= 15) document.getElementById('submit-row').style.display = 'block';
+    const count = Object.keys(answered).length;
+    document.getElementById('ans-num').textContent = `${count} / ${QS.length}`;
+    const pct = Math.round((count / QS.length) * 100);
+    document.getElementById('prog').style.width = pct + '%';
+    document.getElementById('prog-text').textContent = pct + '%';
+    if (count >= 15) document.getElementById('submit-row').style.display = 'block';
 }
 
 function nav(dir){
@@ -358,57 +563,57 @@ function nav(dir){
     document.getElementById('next-btn').disabled = (current === QS.length - 1);
 }
 
+// ==========================================
+// 2. LOG COMPLETION IN LOCAL STORAGE
+// ==========================================
 function submitAssessment(){
     if (submitted) return;
-    submitted = true; 
+    submitted = true;
     clearInterval(timerInt);
     
-    // UNLOCK: Mark React Pre-Assessment as complete
-    localStorage.setItem('react_pre_completed', 'true');
+    // Unlock the next module (Task Manager Project) in the dashboard
+    localStorage.setItem('react_basics_post_completed', 'true');
+    
     showResults();
 }
 
 function showResults(){
     document.getElementById('quiz-ui').style.display = 'none';
-    const r = document.getElementById('results'); 
+    const r = document.getElementById('results');
     r.style.display = 'block';
-    
-    let correct = 0; 
+    let correct = 0;
     QS.forEach((q, i) => { if (answered[i] === q.ans) correct++; });
     const pct = Math.round((correct / QS.length) * 100);
-
     const timeSpentSec = (20 * 60) - timeLeft;
     const m = Math.floor(timeSpentSec / 60), s = timeSpentSec % 60;
 
     r.innerHTML = `
         <div class="results-header">
-            <h2 style="margin-bottom:10px">Pre-Assessment Complete</h2>
+            <h2>🎉 Certification Complete</h2>
             <div class="score-big">${pct}%</div>
-            <p class="subtitle">Diagnostic complete. React Learning Materials are now unlocked.</p>
+            <p>Assessment finished. The Task Manager Project is now unlocked on your dashboard.</p>
         </div>
         <div class="result-grid">
-            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${correct}</div><div class="subtitle">Correct</div></div>
-            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${QS.length - correct}</div><div class="subtitle">Incorrect</div></div>
-            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${m}:${s < 10 ? '0' : ''}${s}</div><div class="subtitle">Duration</div></div>
+            <div class="stat-card"><div style="font-size:28px;font-weight:700;color:var(--primary)">${correct}</div><div style="font-size:12px;font-weight:600;color:var(--text-light)">Correct</div></div>
+            <div class="stat-card"><div style="font-size:28px;font-weight:700;color:var(--error)">${QS.length - correct}</div><div style="font-size:12px;font-weight:600;color:var(--text-light)">Incorrect</div></div>
+            <div class="stat-card"><div style="font-size:28px;font-weight:700;color:var(--primary)">${m}:${s<10?'0':''}${s}</div><div style="font-size:12px;font-weight:600;color:var(--text-light)">Duration</div></div>
         </div>
-
-        <div class="action-buttons">
-            <button class="btn-submit" onclick="window.location.href='content.html'">Go to Learning Content →</button>
+        <div style="display:flex; justify-content:center; gap:16px; margin-bottom:40px;">
+            <button class="btn-submit" onclick="window.location.reload()">Retake Exam</button>
+            <button onclick="window.location.href='../index.html'">Finish & Return to Dashboard</button>
         </div>
-
-        <h3 style="margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Detailed Review</h3>
+        <h3>Detailed Review</h3>
         ${QS.map((q, i) => {
-            const ua = answered[i]; const ok = ua === q.ans;
+            const ua = answered[i], ok = ua === q.ans;
             return `
-            <div class="review-card ${ok ? 'correct' : 'incorrect'}">
-                <div class="qnum">Question ${i + 1}</div>
-                <div style="font-weight:bold; margin-bottom:10px">${q.q}</div>
-                <div style="font-size:0.9rem">Your Answer: ${ua !== undefined ? q.opts[ua] : 'None'}</div>
-                ${!ok ? `<div style="font-size:0.9rem; color:var(--success); font-weight:bold">Correct: ${q.opts[q.ans]}</div>` : ''}
+            <div class="review-card ${ok?'correct':'incorrect'}">
+                <div class="qnum">Question ${i+1}</div>
+                <div style="font-weight:bold;margin-bottom:10px">${q.q}</div>
+                <div style="font-size:0.9rem">Your Answer: ${ua!==undefined?q.opts[ua]:'None'}</div>
+                ${!ok?`<div style="font-size:0.9rem;color:var(--success);font-weight:bold">Correct: ${q.opts[q.ans]}</div>`:''}
                 <div class="exp-box">${q.exp}</div>
             </div>`;
-        }).join('')}
-    `;
+        }).join('')}`;
 }
 
 function startTimer(){
@@ -417,19 +622,13 @@ function startTimer(){
         const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
         const display = document.getElementById('qtimer');
         display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-        
-        if (timeLeft <= 60) display.style.color = "var(--error)";
-        
-        if (timeLeft <= 0) {
-            clearInterval(timerInt);
-            alert("Time's up! Submitting your answers.");
-            submitAssessment();
-        }
+        if (timeLeft <= 60) display.classList.add('warning');
+        if (timeLeft <= 30) display.classList.add('critical');
+        if (timeLeft <= 0) { clearInterval(timerInt); submitAssessment(); }
     }, 1000);
 }
 
-window.onload = function(){ buildQuestions(); startTimer(); }
+// Notice: Removed the duplicate window.onload from the bottom!
 </script>
 </body>
 </html>
-

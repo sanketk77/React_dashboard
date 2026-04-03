@@ -1,370 +1,994 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="../scormdriver.js"></script>
-    <script src="../APIWrapper.js"></script>
+    <script src="scormdriver.js"></script>
+    <script src="APIWrapper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React Advanced — Post-Assessment</title>
+    <title>LLM Basics — Post-Assessment</title>
     <style>
         :root {
             --primary: #1a73e8;
-            --success: #2e7d32;
-            --error: #c62828;
+            --primary-light: #e8f0fe;
+            --primary-dark: #1557b0;
+            --success: #1e8e3e;
+            --success-light: #f1f8e9;
+            --error: #d32f2f;
+            --error-light: #ffebee;
             --bg: #f8f9fa;
+            --bg-light: #ffffff;
             --text-main: #202124;
             --text-sub: #5f6368;
-            --white: #ffffff;
-            --border: #e0e0e0;
-            --code-bg: #202124;
+            --text-light: #80868b;
+            --border: #dadce0;
+            --code-bg: #282c34;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        html, body {
+            height: 100%;
+        }
+
         body { 
-            font-family: 'Google Sans', Roboto, Arial, sans-serif; 
-            background: var(--bg); 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f8 100%);
             color: var(--text-main);
             display: flex;
             min-height: 100vh;
         }
 
-        .sidebar {
-            width: 260px;
-            background: var(--white);
-            border-right: 1px solid var(--border);
-            padding: 2rem 1.5rem;
-            display: flex;
+        /* ===== LOCK OVERLAY ===== */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 9999;
+            display: none;
             flex-direction: column;
-            gap: 1.5rem;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .lock-card {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: var(--shadow-lg); max-width: 450px; border: 1px solid var(--border);
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .lock-icon { font-size: 64px; margin-bottom: 20px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-light);
+            border-right: 1px solid var(--border);
+            padding: 0;
             position: fixed;
             height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
         }
 
+        .sidebar-header {
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .logo-img {
+            width: 160px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-img:hover {
+            transform: scale(1.05);
+        }
+
+        .sidebar-content {
+            padding: 30px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .timer-section {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f7ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .timer-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .timer-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s ease;
+        }
+
+        .timer-value.warning {
+            color: #f57c00;
+        }
+
+        .timer-value.critical {
+            color: var(--error);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .answered-section {
+            background: linear-gradient(135deg, var(--success-light) 0%, #f1f8e9 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+        }
+
+        .answered-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .answered-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .sidebar-nav {
+            margin-top: auto;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-main);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            transform: translateX(-4px);
+        }
+
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
-            padding: 3rem;
-            max-width: 1000px;
-            margin-left: 260px;
+            margin-left: 280px;
+            padding: 40px;
+            overflow-y: auto;
+            max-width: 900px;
         }
 
-        .header { margin-bottom: 2rem; }
-        .badge { 
-            display: inline-block; font-size: 11px; font-weight: bold; 
-            padding: 4px 12px; border-radius: 4px; 
-            background: #e8f0fe; color: #1967d2;
-            margin-bottom: 1rem;
+        .header {
+            margin-bottom: 40px;
+            animation: fadeInDown 0.5s ease;
         }
-        h1 { font-size: 2rem; color: #174ea6; margin-bottom: 0.5rem; }
-        .subtitle { color: var(--text-sub); font-size: 0.95rem; }
 
-        .progress-container { margin-bottom: 2rem; }
-        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary-light) 0%, #d2e3fc 100%);
+            color: var(--primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
+        }
 
-        .qcard { 
-            background: var(--white); 
-            border-radius: 16px; 
-            padding: 2rem; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-            display: none; 
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .progress-percentage {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        /* ===== QUESTION CARD ===== */
+        .qcard {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            display: none;
             border: 1px solid var(--border);
+            min-height: 500px;
+            flex-direction: column;
+            justify-content: space-between;
+            animation: fadeIn 0.4s ease;
         }
-        .qcard.active { display: block; animation: fadeIn 0.4s ease; }
 
-        .topic-label { 
-            font-size: 11px; font-weight: bold; color: var(--primary); 
-            text-transform: uppercase; margin-bottom: 0.5rem; display: block;
+        .qcard.active {
+            display: flex;
         }
-        .qnum { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem; }
-        .qtext { font-size: 1.2rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.4; }
+
+        .qcard-header {
+            margin-bottom: 32px;
+        }
+
+        .topic-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .qnum {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .qtext {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            line-height: 1.5;
+            letter-spacing: -0.3px;
+        }
 
         .code-block {
-            background: var(--code-bg); color: #dcdcdc; padding: 1rem;
-            border-radius: 8px; font-family: monospace;
-            font-size: 0.85rem; margin: 1rem 0; overflow-x: auto;
+            background: var(--code-bg);
+            color: #dcdcdc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            overflow-x: auto;
+            border-left: 4px solid var(--primary);
         }
 
-        .options { display: flex; flex-direction: column; gap: 0.8rem; }
-        .opt { 
-            display: flex; align-items: center; gap: 1rem; 
-            padding: 1rem; border-radius: 12px; 
-            border: 1px solid var(--border); 
-            cursor: pointer; transition: all 0.2s;
+        .qcard-content {
+            flex: 1;
         }
-        .opt:hover { background: #f1f3f4; border-color: var(--primary); }
-        .opt.selected { background: #e8f0fe; border-color: var(--primary); }
-        .olabel { 
-            width: 28px; height: 28px; border-radius: 50%; 
-            border: 1.5px solid #dadce0; display: flex; 
-            align-items: center; justify-content: center; font-size: 13px; font-weight: bold;
+
+        /* ===== OPTIONS ===== */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
         }
-        .opt.selected .olabel { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .nav-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
-        button { 
-            padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
-            background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s;
+        .opt {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-light);
+            position: relative;
+            overflow: hidden;
         }
-        button:hover:not(:disabled) { background: #f1f3f4; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-submit { background: var(--primary); color: white; border: none; }
-        .btn-submit:hover { background: #174ea6; }
 
-        .results-header { text-align: center; padding: 2rem; background: var(--white); border-radius: 16px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .score-big { font-size: 3rem; font-weight: bold; color: var(--primary); }
-        .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: var(--white); padding: 1.5rem; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
-        
-        .review-card { background: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border-left: 5px solid var(--border); }
-        .review-card.correct { border-left-color: var(--success); }
-        .review-card.incorrect { border-left-color: var(--error); }
-        .exp-box { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem; font-size: 0.9rem; color: var(--text-sub); }
+        .opt::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.4s ease;
+        }
 
-        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 30px; padding-bottom: 50px; }
-        .sidebar-link { text-decoration: none; color: var(--text-sub); font-size: 0.9rem; transition: 0.2s; }
-        .sidebar-link:hover { color: var(--primary); }
+        .opt:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .opt:hover::before {
+            left: 100%;
+        }
+
+        .opt.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
+
+        .olabel {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: var(--bg);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .opt.selected .olabel {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        .otext {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        /* ===== CONTROLS ===== */
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        button {
+            padding: 12px 28px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            background: var(--bg-light);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            color: var(--text-main);
+        }
+
+        button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+            font-weight: 700;
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        #submit-row {
+            display: none;
+        }
+
+        /* ===== RESULTS ===== */
+        #results {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-header {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-light);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .results-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .score-big {
+            font-size: 56px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .results-subtitle {
+            font-size: 16px;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-light);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn-submit {
+            padding: 14px 32px;
+            font-size: 15px;
+        }
+
+        .review-section {
+            margin-top: 40px;
+        }
+
+        .review-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .review-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border-left: 5px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .review-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateX(4px);
+        }
+
+        .review-card.correct {
+            border-left-color: var(--success);
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--success-light) 100%);
+        }
+
+        .review-card.incorrect {
+            border-left-color: var(--error);
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--error-light) 100%);
+        }
+
+        .review-qtext {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .review-item {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .review-item.correct {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .review-item.incorrect {
+            color: var(--error);
+        }
+
+        .exp-box {
+            background: rgba(0,0,0,0.03);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-sub);
+            border-left: 3px solid var(--primary);
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .sidebar { width: 260px; }
+            .main-content { margin-left: 260px; padding: 30px; }
+            .header h1 { font-size: 28px; }
+            .qcard { padding: 24px; min-height: 450px; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+            .sidebar-content { flex-direction: row; gap: 20px; padding: 20px; }
+            .main-content { margin-left: 0; padding: 20px; max-width: 100%; }
+            .header h1 { font-size: 24px; }
+            .qcard { padding: 20px; min-height: auto; }
+            .nav-controls { flex-direction: column; gap: 12px; }
+            button { width: 100%; justify-content: center; }
+            .result-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .action-buttons .btn-submit { width: 100%; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
     </style>
 </head>
 <body>
 
+<div id="lock-screen">
+    <div class="lock-card">
+        <div class="lock-icon">🔒</div>
+        <h2 style="margin-bottom: 12px; color: var(--text-main);">Assessment Locked</h2>
+        <p id="lock-message" style="color: var(--text-sub); margin-bottom: 24px; line-height: 1.5;">Please complete the required materials before attempting this assessment.</p>
+        <button id="lock-action-btn" class="btn-submit" onclick="window.location.href='index.html'" style="margin: 0 auto 12px auto; display: block;">Return to Dashboard</button>
+        <button onclick="window.location.href='index.html'" style="margin: 0 auto; display: block; background: transparent; color: var(--text-sub); border: none; box-shadow: none; font-size: 13px; cursor:pointer;">← Back to Dashboard</button>
+    </div>
+</div>
+
 <div class="sidebar">
-    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
-    <div style="margin-top: 2rem;">
-        <div class="subtitle" style="font-size: 0.8rem; text-transform: uppercase;">Time Elapsed</div>
-        <div id="qtimer" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">00:00</div>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <img src="jade_logo.webp" alt="Jade Global Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none; font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">JADE GLOBAL AI</div>
+        </div>
     </div>
-    <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 10px;">
-        <a href="../index.html" class="sidebar-link">← Exit to Dashboard</a>
-    </div>
-    <div style="margin-top: auto;">
-        <div class="subtitle">Questions Answered</div>
-        <div id="ans-num" style="font-weight: bold;">0 / 20</div>
+    <div class="sidebar-content">
+        <div class="timer-section">
+            <div class="timer-label">⏱ Time Remaining</div>
+            <div id="qtimer" class="timer-value">20:00</div>
+        </div>
+        <div class="answered-section">
+            <div class="answered-label">✓ Answered</div>
+            <div class="answered-count" id="ans-num">0 / 20</div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html">← Exit to Dashboard</a>
+        </nav>
     </div>
 </div>
 
 <div class="main-content">
     <div id="quiz-ui">
         <div class="header">
-            <div class="badge">Advanced Certification</div>
-            <h1>Advanced React Assessment</h1>
-            <p class="subtitle">Validate your mastery of architecture, global state, SSR, and performance optimization.</p>
+            <div class="badge">Module 1: LLM Basics</div>
+            <h1>Post-Assessment</h1>
+            <p class="subtitle">Demonstrate your learning from the course materials. Answer based on what you've learned.</p>
         </div>
 
         <div class="progress-container">
-            <div class="progress-bar"><div class="progress-fill" id="prog" style="width: 0%"></div></div>
+            <div class="progress-info">
+                <span class="progress-label">Progress</span>
+                <span class="progress-percentage" id="prog-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="prog" style="width: 0%"></div>
+            </div>
         </div>
 
         <div id="questions-container"></div>
 
         <div class="nav-controls">
-            <button id="prev-btn" onclick="nav(-1)" disabled>Previous</button>
-            <div id="submit-row" style="display:none">
-                <button class="btn-submit" onclick="submitAssessment()">Submit Final Quiz</button>
+            <button id="prev-btn" onclick="nav(-1)" disabled>← Previous</button>
+            <div id="submit-row">
+                <button class="btn-submit" onclick="submitAssessment()">Submit Final Quiz →</button>
             </div>
-            <button id="next-btn" onclick="nav(1)">Next</button>
+            <button id="next-btn" onclick="nav(1)">Next →</button>
         </div>
     </div>
 
-    <div id="results" style="display:none"></div>
+    <div id="results"></div>
 </div>
 
 <script>
-    // 1. GATEKEEPER: Ensure Advanced Content was reviewed first
-window.onload = function() {
-    const contentDone = localStorage.getItem('react_adv_content_completed'); 
-    if (!contentDone) {
-        alert("Please review the Advanced Learning Materials before taking this Certification Quiz.");
-        window.location.href = "adv_content.html";
-        return;
+// ==========================================
+// 1. STRICT AUTO-REDIRECT GATEKEEPER 
+// Uses DOMContentLoaded to run instantly
+// ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+    const preDone = localStorage.getItem('adv_pre_completed');
+    const contentDone = localStorage.getItem('adv_content_completed'); 
+    
+    // Check 1: Did they skip the Pre-Assessment?
+    if (!preDone) {
+        document.querySelector('.main-content').style.display = 'none';
+        document.getElementById('lock-screen').style.display = 'flex';
+        document.getElementById('lock-message').innerHTML = "You must complete the <b>Pre-Assessment</b> first.";
+        document.getElementById('lock-action-btn').innerHTML = "Take Pre-Assessment";
+        document.getElementById('lock-action-btn').onclick = function() { window.location.href = 'adv_pre_assessment.html'; };
+        return; 
     }
+    
+    // Check 2: Did they skip the Learning Content?
+    if (!contentDone) {
+        document.querySelector('.main-content').style.display = 'none';
+        document.getElementById('lock-screen').style.display = 'flex';
+        document.getElementById('lock-message').innerHTML = "Please review the <b>Learning Materials</b> before taking this Post-Assessment.";
+        document.getElementById('lock-action-btn').innerHTML = "Return to Learning Content";
+        document.getElementById('lock-action-btn').onclick = function() { window.location.href = 'adv_content.html'; };
+        return; 
+    }
+    
+    // If both checks pass, build the quiz!
     buildQuestions();
     startTimer();
-};
+});
+
 const QS = [
     {
-        topic: "Architecture",
-        q: "In a Redux architecture, which part is responsible for transforming the current state into a new state based on an action?",
-        opts: ["The Store", "The Dispatcher", "The Reducer", "The Selector"],
-        ans: 2,
-        exp: "Reducers are pure functions that take the current state and an action to return the next state, ensuring unidirectional and predictable data flow."
+        topic:"Transformer Architecture",
+        q:"According to the 2017 paper 'Attention is All You Need', what is the 'engine' powering modern LLMs?",
+        opts:["Recurrent Neural Networks (RNNs)","The Transformer Architecture","Long Short-Term Memory (LSTM)","Convolutional Neural Networks"],
+        ans:1,
+        exp:"The Transformer architecture, introduced in 2017, is the foundation for models like GPT, Claude, and Gemini."
     },
     {
-        topic: "Next.js",
-        q: "You are building a blog that needs excellent SEO and fast initial page loads. Which Next.js strategy is best?",
-        opts: ["Client-Side Rendering (CSR)", "Server-Side Rendering (SSR) or SSG", "Local Storage persistence", "Prop Drilling"],
-        ans: 1,
-        exp: "Next.js supports SSR and Static Site Generation (SSG), which pre-renders HTML on the server, making it indexable by search engines."
+        topic:"Transformer Architecture",
+        q:"Which mechanism allows a Transformer to connect every word in a sentence to every other word regardless of distance?",
+        opts:["Sequential Bottleneck","The Attention Mechanism","Linear Transformation","Data Scraping"],
+        ans:1,
+        exp:"The Attention mechanism looks at ALL other words to determine context, solving the long-term context memory loss of RNNs."
     },
     {
-        topic: "Server State",
-        q: "Which React Query configuration ensures your data is refreshed automatically when a user returns to the browser tab?",
-        opts: ["staleTime: Infinity", "refetchOnWindowFocus: true", "cacheTime: 0", "enabled: false"],
-        ans: 1,
-        exp: "refetchOnWindowFocus is a core feature that keeps server state synchronized with the UI whenever the app regains focus."
+        topic:"Transformer Architecture",
+        q:"In the Attention formula, which component represents 'What information do I provide?'",
+        opts:["Query (Q)","Key (K)","Value (V)","Positional Encoding"],
+        ans:2,
+        exp:"Value (V) represents the actual content or information provided by a token."
     },
     {
-        topic: "Optimization",
-        q: "What is the primary difference between 'useMemo' and 'React.memo'?",
-        opts: ["One is for functions, one is for variables", "useMemo memoizes a value; React.memo memoizes a whole component", "They are identical", "useMemo is for Class components"],
-        ans: 1,
-        exp: "useMemo caches expensive calculations inside a component; React.memo is an HOC that prevents component re-renders if props don't change."
+        topic:"Transformer Architecture",
+        q:"Which half of the Transformer is responsible for 'Understanding' and building a contextual representation?",
+        opts:["The Decoder","The Encoder","The Output Layer","The Softmax Layer"],
+        ans:1,
+        exp:"The Encoder handles input embedding and positional encoding to 'understand' context."
     },
     {
-        topic: "Testing",
-        q: "When testing a component, why is 'user-event' preferred over 'fireEvent' in React Testing Library?",
-        opts: ["It is faster to execute", "It more closely simulates real browser interactions (like focus and hover)", "It is built into the browser", "It does not require Jest"],
-        ans: 1,
-        exp: "user-event simulates full interactions, triggering all associated events rather than just the single event targeted by fireEvent."
+        topic:"Transformer Architecture",
+        q:"Which model type uses only the 'Decoder' half of the Transformer for generation?",
+        opts:["BERT","RoBERTa","GPT-4","T5"],
+        ans:2,
+        exp:"GPT-4, Claude, and Llama are Decoder-only models focused on generating one token at a time."
     },
     {
-        topic: "Next.js Data",
-        q: "What does the following Next.js function do?",
-        code: "export async function getStaticProps() { ... }",
-        opts: ["Fetches data on every client-side click", "Fetches data at build time to generate static HTML", "Handles API POST requests", "Sets up a WebSocket connection"],
-        ans: 1,
-        exp: "getStaticProps allows you to fetch data during the build process, resulting in highly performant static pages."
+        topic:"Transformer Architecture",
+        q:"Why is 'Positional Encoding' added to token embeddings?",
+        opts:["To reduce GPU costs","Because the attention mechanism has no inherent sense of word order","To translate words into French","To clean toxic content"],
+        ans:1,
+        exp:"Without positional encoding, a Transformer would treat 'Dog bites man' and 'Man bites dog' identically because attention has no sense of sequence."
     },
     {
-        topic: "State Management",
-        q: "Which state management library is known for its 'no-provider' approach and simpler API compared to Redux?",
-        opts: ["Context API", "Zustand", "Redux Toolkit", "MobX"],
-        ans: 1,
-        exp: "Zustand provides a minimalist, hook-based state management solution that doesn't require wrapping your app in providers."
+        topic:"Transformer Architecture",
+        q:"What stage uses probabilities over the entire vocabulary to pick the highest probability token?",
+        opts:["Input Tokens","Layer Normalization","Output Layer + Softmax","Multi-Head Self-Attention"],
+        ans:2,
+        exp:"The final Softmax layer converts internal values into probabilities to select the next token."
     },
     {
-        topic: "Performance",
-        q: "What is 'Tree Shaking' in a production build process?",
-        opts: ["A way to organize file folders", "The removal of unused code from the final bundle to reduce size", "A method for testing deep trees", "A performance hook for animations"],
-        ans: 1,
-        exp: "Tree shaking is an optimization technique used by bundlers to eliminate dead code, ensuring only necessary logic is shipped."
+        topic:"What are LLMs",
+        q:"What is the primary objective of an LLM during the 'Pre-training' phase?",
+        opts:["Translating books","Predicting the next token/word in a sequence","Cleaning Wikipedia data","Developing human emotions"],
+        ans:1,
+        exp:"LLMs learn by predicting the next word trillions of times from massive internet-scale data."
     },
     {
-        topic: "Server State",
-        q: "In React Query, what does 'Stale Time' refer to?",
-        opts: ["Time before unmount", "Duration data is 'fresh' before a refetch is allowed", "Data fetch time", "UI delay"],
-        ans: 1,
-        exp: "Stale time determines how long the data remains valid in the cache before a background update is needed."
+        topic:"What are LLMs",
+        q:"What does 'RLHF' stand for in the LLM training pipeline?",
+        opts:["Rapid Learning High Frequency","Reinforcement Learning from Human Feedback","Remote Language Handling Function","Randomized Linear Hidden Filters"],
+        ans:1,
+        exp:"RLHF uses human feedback to align the model's raw capabilities with human values and safety."
     },
     {
-        topic: "Testing",
-        q: "Which testing library is built into standard React environments by default?",
-        opts: ["Cypress", "Selenium", "Jest", "Playwright"],
-        ans: 2,
-        exp: "Jest is the default test runner and assertion library for most React projects."
+        topic:"What are LLMs",
+        q:"Approximately how many parameters does GPT-4 contain?",
+        opts:["175 Billion","500 Million","1.8 Trillion","10 Trillion"],
+        ans:2,
+        exp:"GPT-4 is a massive model with approximately 1.8 trillion parameters."
     },
     {
-        topic: "Optimization",
-        q: "What is 'Code Splitting' primarily used for?",
-        opts: ["Formatting code", "Reducing initial load time by loading chunks on demand", "Securing API keys", "Syncing databases"],
-        ans: 1,
-        exp: "Code splitting breaks the bundle into smaller pieces to speed up initial site loading."
+        topic:"LLM Applications",
+        q:"Which healthcare software provider uses LLMs specifically for clinical note drafting?",
+        opts:["Khan Academy","Epic","Harvey AI","Shopify"],
+        ans:1,
+        exp:"Epic uses LLMs to help healthcare providers generate clinical notes and summarize patient records."
     },
     {
-        topic: "Advanced Hooks",
-        q: "Which hook provides a way to handle imperative handle methods with refs?",
-        opts: ["useRef", "useImperativeHandle", "useLayoutEffect", "useCallback"],
-        ans: 1,
-        exp: "useImperativeHandle customizes the instance value exposed to parent components when using refs."
+        topic:"LLM Applications",
+        q:"Which model was specifically trained on financial data?",
+        opts:["Claude 3","Gemini 1.5","Bloomberg GPT","Mistral"],
+        ans:2,
+        exp:"Bloomberg GPT is an example of an industry-specific model trained on financial reporting data."
     },
     {
-        topic: "Hydration",
-        q: "What is 'Hydration' in the context of SSR?",
-        opts: ["Cleaning code", "Attaching event listeners to static server HTML on the client", "Downloading images", "DB connecting"],
-        ans: 1,
-        exp: "Hydration turns static HTML from the server into an interactive React app on the client side."
+        topic:"LLM Applications",
+        q:"Which application uses LLMs for automated code autocomplete and test generation?",
+        opts:["Netflix","GitHub Copilot","Spotify","Waymo"],
+        ans:1,
+        exp:"Software development is being changed by tools like GitHub Copilot, Cursor, and Tabnine."
     },
     {
-        topic: "Architecture",
-        q: "What is the 'Flux' architecture?",
-        opts: ["CSS Framework", "Unidirectional data flow pattern used by Redux", "Query language", "Browser engine"],
-        ans: 1,
-        exp: "Flux is the architecture Redux is based on, ensuring data flows in one consistent direction."
+        topic:"LLM Applications",
+        q:"What is a capability of Multimodal AI models like Gemini 1.5 Pro?",
+        opts:["Summarizing video content and describing actions","Translating only two languages","Fixing hardware bugs","Running without GPUs"],
+        ans:0,
+        exp:"Multimodal models can reason about video content, images, and audio in addition to text."
     },
     {
-        topic: "Redux",
-        q: "In Redux, what is the role of a 'Selector'?",
-        opts: ["To change the state", "To extract specific pieces of data from the store efficiently", "To trigger API calls", "To style components"],
-        ans: 1,
-        exp: "Selectors are used to query and derive specific data points from the global state store."
+        topic:"Prompt Basics",
+        q:"Which prompting strategy involves giving 2-5 examples before the actual task?",
+        opts:["Zero-Shot Prompting","Few-Shot Prompting","Topic Labeling","Role Prompting"],
+        ans:1,
+        exp:"Few-shot prompting is best for nuanced or pattern-based tasks where examples guide the model."
     },
     {
-        topic: "Concurrent",
-        q: "What does the 'Suspense' component allow you to do?",
-        opts: ["Stop the app", "Show a fallback while waiting for content/code to load", "Hide errors", "Delete state"],
-        ans: 1,
-        exp: "Suspense lets components 'wait' for something before rendering, typically used for lazy-loaded components."
+        topic:"Prompt Basics",
+        q:"What is a major risk when using LLMs for legal research or document drafting?",
+        opts:["The model is too slow","Hallucinations (stating false facts confidently)","The model cannot read PDFs","The model only knows 1950s law"],
+        ans:1,
+        exp:"LLMs cannot always guarantee factual accuracy and can hallucinate fake court cases or facts."
     },
     {
-        topic: "Patterns",
-        q: "What is a 'Higher-Order Component' (HOC)?",
-        opts: ["List component", "Function taking a component and returning a new one", "Root component", "Prop component"],
-        ans: 1,
-        exp: "HOCs are advanced patterns for reusing component logic by wrapping components in functions."
+        topic:"Prompt Basics",
+        q:"Which best practice helps an LLM act as a 'Smart Intern'?",
+        opts:["Providing no context","Being vague","Giving a specific role and clear context","Asking for 50 tasks at once"],
+        ans:2,
+        exp:"To get better results, you should provide context, assign a role (e.g., Senior Developer), and be specific."
     },
     {
-        topic: "Next.js",
-        q: "Which Next.js feature updates static content without a full rebuild?",
-        opts: ["SSR", "Incremental Static Regeneration (ISR)", "CSR", "Hydration"],
-        ans: 1,
-        exp: "ISR allows you to update specific static pages in the background after deployment without a full site rebuild."
+        topic:"NLP Fundamentals",
+        q:"Which type of tokenization does GPT use to handle unknown words by breaking them into frequent fragments?",
+        opts:["Word Tokenization","Character Tokenization","Subword (BPE) Tokenization","Sentence Parsing"],
+        ans:2,
+        exp:"LLMs use Byte Pair Encoding (BPE) or subword tokenization to handle morphology and rare words."
     },
     {
-        topic: "Testing",
-        q: "What is the purpose of 'Mock Service Worker' (MSW)?",
-        opts: ["Deployment", "Intercepting and mocking API requests for reliable testing", "Speeding internet", "CSS management"],
-        ans: 1,
-        exp: "MSW mocks network requests to ensure tests are fast, reliable, and decoupled from actual server availability."
+        topic:"NLP Fundamentals",
+        q:"What does the analogy 'King - Man + Woman = Queen' demonstrate about word embeddings?",
+        opts:["The model was manually programmed with royal facts","Embeddings capture semantic relationships and reasoning from text patterns","Embeddings only work for gender-based words","The model is conscious of royal hierarchies"],
+        ans:1,
+        exp:"Embeddings represent words as vectors where similar meanings occupy similar positions in multidimensional space."
     },
     {
-        topic: "Lifecycle",
-        q: "Which hook is used to measure the layout of a DOM element synchronously?",
-        opts: ["useEffect", "useLayoutEffect", "useMemo", "useCallback"],
-        ans: 1,
-        exp: "useLayoutEffect runs synchronously after DOM updates to read layout values before the browser paints."
+        topic:"Introduction to AI",
+        q:"What is the relationship between AI, Machine Learning (ML), and Deep Learning (DL)?",
+        opts:["They are the same thing","ML is a subset of AI; DL is a subset of ML","AI is a subset of DL","They are unrelated categories"],
+        ans:1,
+        exp:"AI is the broadest field; ML is a subset of AI, and DL (using multi-layered neural nets) is a subset of ML."
     }
 ];
 
-let current = 0, answered = {}, submitted = false;
-let timeLeft = 20 * 60; // 20 Minutes in seconds
+let current = 0;
+let answered = {};
+let submitted = false;
+let timeLeft = 20 * 60;
 let timerInt;
 
-function buildQuestions(){
+function buildQuestions() {
     const c = document.getElementById('questions-container');
     QS.forEach((q, i) => {
         const d = document.createElement('div');
         d.className = 'qcard' + (i === 0 ? ' active' : '');
         d.id = 'q' + i;
         d.innerHTML = `
-            <div class="topic-label">${q.topic}</div>
-            <div class="qnum">Task ${i + 1} of ${QS.length}</div>
-            <div class="qtext">${q.q}</div>
-            ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
-            <div class="options" id="opts${i}">
-                ${q.opts.map((o, j) => `
-                    <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
-                        <div class="olabel">${String.fromCharCode(65+j)}</div>
-                        <div class="otext">${o}</div>
-                    </div>`).join('')}
+            <div class="qcard-header">
+                <div class="topic-label">📌 ${q.topic}</div>
+                <div class="qnum">Question ${i + 1} of ${QS.length}</div>
+                <div class="qtext">${q.q}</div>
+                ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
+            </div>
+            <div class="qcard-content">
+                <div class="options" id="opts${i}">
+                    ${q.opts.map((o, j) => `
+                        <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
+                            <div class="olabel">${String.fromCharCode(65+j)}</div>
+                            <div class="otext">${o}</div>
+                        </div>`).join('')}
+                </div>
             </div>`;
         c.appendChild(d);
     });
 }
 
-function selectOpt(qi, oi){
+function selectOpt(qi, oi) {
     if (submitted) return;
     answered[qi] = oi;
     document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
-    document.getElementById('ans-num').textContent = `${Object.keys(answered).length} / ${QS.length}`;
-    document.getElementById('prog').style.width = Math.round((Object.keys(answered).length / QS.length) * 100) + '%';
     
-    // Show submit button once all 20 questions are answered
-    if (Object.keys(answered).length === QS.length) document.getElementById('submit-row').style.display = 'block';
+    const answeredCount = Object.keys(answered).length;
+    document.getElementById('ans-num').textContent = `${answeredCount} / ${QS.length}`;
+    
+    const progPct = Math.round((answeredCount / QS.length) * 100);
+    document.getElementById('prog').style.width = progPct + '%';
+    document.getElementById('prog-text').textContent = progPct + '%';
+    
+    // Show submit button when all questions are answered
+    if (answeredCount === QS.length) {
+        document.getElementById('submit-row').style.display = 'block';
+    }
 }
 
-function nav(dir){
+function nav(dir) {
     document.getElementById('q' + current).classList.remove('active');
     current = Math.max(0, Math.min(QS.length - 1, current + dir));
     document.getElementById('q' + current).classList.add('active');
@@ -372,17 +996,17 @@ function nav(dir){
     document.getElementById('next-btn').disabled = (current === QS.length - 1);
 }
 
-function submitAssessment(){
+function submitAssessment() {
     if (submitted) return;
     submitted = true; 
     clearInterval(timerInt);
     
-    // UNLOCK: Mark React Advanced Post-Assessment as complete to unlock the final lab
-    localStorage.setItem('react_adv_post_completed', 'true');
+    // Update local storage key matching the original prompt
+    localStorage.setItem('basics_post_completed', 'true');
     showResults();
 }
 
-function showResults(){
+function showResults() {
     document.getElementById('quiz-ui').style.display = 'none';
     const r = document.getElementById('results'); 
     r.style.display = 'block';
@@ -393,51 +1017,74 @@ function showResults(){
 
     const timeSpentSec = (20 * 60) - timeLeft;
     const m = Math.floor(timeSpentSec / 60), s = timeSpentSec % 60;
+    const timeStr = `${m}:${s < 10 ? '0' : ''}${s}`;
 
     r.innerHTML = `
         <div class="results-header">
-            <h2 style="margin-bottom:10px">Certification Complete</h2>
+            <h2>🎉 Post-Assessment Complete</h2>
             <div class="score-big">${pct}%</div>
-            <p class="subtitle">${pct >= 70 ? 'Advanced Mastery Confirmed! Proceed to your final Capstone Project.' : 'High score achieved. Review technical context below before the project.'}</p>
+            <p class="results-subtitle">Great work! The Practical Assignment is now unlocked.</p>
         </div>
+
         <div class="result-grid">
-            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${correct}</div><div class="subtitle">Correct</div></div>
-            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${QS.length - correct}</div><div class="subtitle">Incorrect</div></div>
-            <div class="stat-card"><div style="font-size:24px; font-weight:bold">${m}:${s < 10 ? '0' : ''}${s}</div><div class="subtitle">Duration</div></div>
+            <div class="stat-card">
+                <div class="stat-value">${correct}</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--error)">${QS.length - correct}</div>
+                <div class="stat-label">Incorrect</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--primary)">${timeStr}</div>
+                <div class="stat-label">Duration</div>
+            </div>
         </div>
 
         <div class="action-buttons">
-            <button class="btn-submit" onclick="window.location.href='../index.html'" style="background: var(--white); color: var(--primary); border: 1px solid var(--primary);">Return to Dashboard</button>
-            <button class="btn-submit" onclick="window.location.href='adv_assignment.html'">Final Capstone Project →</button>
+            <button class="btn-submit" onclick="window.location.href='index.html'" style="background: var(--bg-light); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;">← Return to Dashboard</button>
+            <button class="btn-submit" onclick="window.location.href='assignment.html'">💻 Go to Assignment →</button>
         </div>
 
-        <h3 style="margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Review Responses</h3>
-        ${QS.map((q, i) => {
-            const ua = answered[i]; const ok = ua === q.ans;
-            return `
-            <div class="review-card ${ok ? 'correct' : 'incorrect'}">
-                <div class="qnum">Question ${i + 1}</div>
-                <div style="font-weight:bold; margin-bottom:10px">${q.q}</div>
-                <div style="font-size:0.9rem">Selection: ${ua !== undefined ? q.opts[ua] : 'None'}</div>
-                ${!ok ? `<div style="font-size:0.9rem; color:var(--success); font-weight:bold">Correct: ${q.opts[q.ans]}</div>` : ''}
-                <div class="exp-box"><strong>Technical Context:</strong> ${q.exp}</div>
-            </div>`;
-        }).join('')}
+        <div class="review-section">
+            <h3>📋 Review Responses</h3>
+            ${QS.map((q, i) => {
+                const ua = answered[i]; const ok = ua === q.ans;
+                return `
+                <div class="review-card ${ok ? 'correct' : 'incorrect'}">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span style="font-size: 18px;">${ok ? '✓' : '✗'}</span>
+                        <div class="review-qtext">Question ${i + 1}</div>
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-main);">${q.q}</div>
+                    ${q.code ? `<div class="code-block" style="margin-bottom: 12px; margin-top: 0;">${q.code}</div>` : ''}
+                    <div class="review-item">Your Answer: <strong>${ua !== undefined ? q.opts[ua] : 'Not answered'}</strong></div>
+                    ${!ok ? `<div class="review-item correct">✓ Correct: ${q.opts[q.ans]}</div>` : ''}
+                    <div class="exp-box">💡 <strong>Context:</strong> ${q.exp}</div>
+                </div>`;
+            }).join('')}
+        </div>
     `;
 }
 
-function startTimer(){
+function startTimer() {
     timerInt = setInterval(() => {
         timeLeft--;
         const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
         const display = document.getElementById('qtimer');
         display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
         
-        if (timeLeft <= 60) display.style.color = "var(--error)";
+        if (timeLeft <= 60) {
+            display.classList.add('warning');
+        }
+        if (timeLeft <= 30) {
+            display.classList.remove('warning');
+            display.classList.add('critical');
+        }
         
         if (timeLeft <= 0) {
             clearInterval(timerInt);
-            alert("Time's up! Submitting your final assessment.");
+            alert("⏱ Time is up! Submitting your final assessment.");
             submitAssessment();
         }
     }, 1000);
