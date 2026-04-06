@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React.js Mastery Path - Dashboard</title>
     
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -23,6 +22,8 @@
             --success-light: #66bb6a;
             --warning: #f57c00;
             --danger: #c62828;
+            --final: #673ab7;
+            --final-dark: #512da8;
             --bg-main: #f5f7fa;
             --bg-card: #ffffff;
             --text-main: #1a1a1a;
@@ -57,27 +58,27 @@
             flex-direction: column;
         }
 
-       .sidebar-header {
-    padding: 20px;
-    display: flex;
-    justify-content: center; /* Centers the logo horizontally */
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 20px;
-}
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
 
-.sidebar-logo {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
+        .sidebar-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
 
-.logo-img {
-    width: 180px;      /* Adjust this width based on your PNG's dimensions */
-    height: auto;      /* Maintains aspect ratio */
-    display: block;
-    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1)); /* Optional: adds a soft shadow */
-}
+        .logo-img {
+            width: 180px;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
+        }
 
         .sidebar h3 {
             font-size: 16px;
@@ -189,14 +190,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .header {
@@ -235,27 +230,14 @@
             transform: translateY(-5px);
         }
 
-        .level-card:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .level-card:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .level-card:nth-child(4) {
-            animation-delay: 0.3s;
-        }
+        .level-card:nth-child(2) { animation-delay: 0.1s; }
+        .level-card:nth-child(3) { animation-delay: 0.2s; }
+        .level-card:nth-child(4) { animation-delay: 0.3s; }
+        .level-card:nth-child(5) { animation-delay: 0.4s; }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .level-header {
@@ -416,14 +398,8 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1.5);
-                opacity: 0;
-            }
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
 
         /* ============ LEVEL PROGRESS ============ */
@@ -481,14 +457,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .completion-icon {
@@ -534,114 +504,39 @@
 
         /* ============ RESPONSIVE ============ */
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 240px;
-            }
-
-            .main-content {
-                margin-left: 240px;
-                padding: 25px;
-            }
-
-            .grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            }
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 240px; padding: 25px; }
+            .grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
         }
 
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 20px;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-
-            .header h1 {
-                font-size: 28px;
-            }
-
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
-            .level-card {
-                padding: 20px;
-            }
-
-            .level-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .level-badge {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .level-progress {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .completion-content {
-                padding: 30px;
-                max-width: 90%;
-            }
-
-            .level-shortcuts {
-                display: none;
-            }
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; padding: 20px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .header h1 { font-size: 28px; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .level-card { padding: 20px; }
+            .level-header { flex-direction: column; align-items: flex-start; }
+            .level-badge { width: 40px; height: 40px; font-size: 20px; }
+            .level-progress { flex-direction: column; gap: 15px; }
+            .completion-content { padding: 30px; max-width: 90%; }
+            .level-shortcuts { display: none; }
         }
 
         @media (max-width: 480px) {
-            .sidebar {
-                padding: 15px;
-            }
-
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .step-btn {
-                padding: 12px;
-                font-size: 12px;
-            }
-
-            .level-card {
-                padding: 15px;
-                margin-bottom: 20px;
-            }
-
-            .level-info h2 {
-                font-size: 18px;
-            }
-
-            .level-progress {
-                flex-direction: column;
-            }
+            .sidebar { padding: 15px; }
+            .header h1 { font-size: 24px; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .step-btn { padding: 12px; font-size: 12px; }
+            .level-card { padding: 15px; margin-bottom: 20px; }
+            .level-info h2 { font-size: 18px; }
+            .level-progress { flex-direction: column; }
         }
     </style>
 </head>
 
 <body>
 
-<!-- ============ SIDEBAR ============ -->
 <div class="sidebar">
     <div class="sidebar-header">
     <div class="sidebar-logo">
@@ -655,7 +550,7 @@
             <div class="progress-fill" id="overall-progress"></div>
         </div>
         <div class="progress-stats">
-            <span id="progress-completed">0/12</span>
+            <span id="progress-completed">0/14</span>
             <span id="progress-percent">0%</span>
         </div>
     </div>
@@ -674,6 +569,10 @@
             <i class="fas fa-rocket"></i>
             <span>Level 3: Advanced</span>
         </a>
+        <a href="#final-card" class="level-shortcut" style="border-color: var(--final);">
+            <i class="fas fa-trophy" style="color: var(--final-light);"></i>
+            <span>Final Assessment</span>
+        </a>
     </div>
 
     <button class="reset-btn" onclick="confirmReset()">
@@ -681,15 +580,13 @@
     </button>
 </div>
 
-<!-- ============ MAIN CONTENT ============ -->
 <div class="main-content">
 
     <div class="header">
-        <h1>⚛️ React.js Mastery Journey</h1>
+        <h1>⚛️ React.js Mastery Path</h1>
         <p class="header-subtitle">Master React from fundamentals to enterprise patterns</p>
     </div>
 
-    <!-- LEVEL 1: FOUNDATIONS -->
     <div class="level-card" id="basics">
         <div class="level-header">
             <div class="level-badge">
@@ -733,7 +630,6 @@
         </div>
     </div>
 
-    <!-- LEVEL 2: INTERMEDIATE -->
     <div class="level-card" id="intermediate">
         <div class="level-header">
             <div class="level-badge" style="background: linear-gradient(135deg, var(--warning) 0%, #ff9800 100%);">
@@ -751,7 +647,7 @@
                 <i class="fas fa-clipboard-list"></i>
                 <span>Pre</span>
             </a>
-            <a href="intermediate/int_content.html" class="step-btn" id="int-ppt" title="Video & Slides">
+            <a href="intermediate/content.html" class="step-btn" id="int-ppt" title="Video & Slides">
                 <i class="fas fa-video"></i>
                 <span>Content</span>
             </a>
@@ -777,7 +673,6 @@
         </div>
     </div>
 
-    <!-- LEVEL 3: ADVANCED -->
     <div class="level-card" id="advanced">
         <div class="level-header">
             <div class="level-badge" style="background: linear-gradient(135deg, var(--danger) 0%, #e53935 100%);">
@@ -821,17 +716,47 @@
         </div>
     </div>
 
+    <div class="level-card" id="final-card">
+        <div class="level-header">
+            <div class="level-badge" style="background: linear-gradient(135deg, var(--final) 0%, var(--final-dark) 100%);">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="level-info">
+                <h2>Final Assessment</h2>
+                <p>Prove your expertise with a comprehensive Theory Exam and Practical Architecture Lab.</p>
+            </div>
+            <div class="level-status" id="status-final" style="background: var(--final-light); color: var(--final);">Locked</div>
+        </div>
+
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <a href="consolidated/mcqs.html" class="step-btn locked" id="final-mcq" title="Theory Exam">
+                <i class="fas fa-brain"></i>
+                <span>Part 1: Theory Exam</span>
+            </a>
+            <a href="consolidated/practical.html" class="step-btn locked" id="final-practical" title="Architecture Lab">
+                <i class="fas fa-laptop-code"></i>
+                <span>Part 2: Practical Lab</span>
+            </a>
+        </div>
+
+        <div class="level-progress">
+            <div class="progress-item">
+                <div class="progress-item-label">Status</div>
+                <div class="progress-item-value" id="final-completion" style="color: var(--final);">0%</div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- ============ COMPLETION BANNER ============ -->
 <div class="completion-banner" id="completion-banner">
     <div class="completion-content">
         <div class="completion-icon">
             <i class="fas fa-check-circle"></i>
         </div>
         <h2>🎉 Congratulations!</h2>
-        <p>You have successfully completed the React.js Mastery Journey! You're now a React expert.</p>
-        <button class="completion-btn" onclick="window.location.reload()">Finish</button>
+        <p>You have successfully passed all theory and practical tests. You are now a certified React.js Expert!</p>
+        <button class="completion-btn" onclick="closeCompletionBanner()">Finish</button>
     </div>
 </div>
 
@@ -859,6 +784,12 @@ function completeCourse() {
     }
 }
 
+// Function to dismiss the completion banner and ensure it doesn't trigger repeatedly
+function closeCompletionBanner() {
+    document.getElementById('completion-banner').classList.remove('active');
+    localStorage.setItem('course_fully_acknowledged', 'true');
+}
+
 //////////////////////////
 // PROGRESS LOGIC
 //////////////////////////
@@ -870,8 +801,9 @@ function checkProgress() {
         { prefix: 'adv', name: 'Level 3' }
     ];
 
-    let totalCompleted = 0;
+    let totalStepsCompleted = 0;
 
+    // 1. Evaluate standard modules (Levels 1 to 3)
     levels.forEach(level => {
         const preDone = localStorage.getItem(`react_${level.prefix}_pre_completed`);
         const contentDone = localStorage.getItem(`react_${level.prefix}_content_completed`);
@@ -881,73 +813,124 @@ function checkProgress() {
         let levelCompletion = 0;
         let nextStep = 'Locked';
 
-        // Update UI elements
         const preBtn = document.getElementById(`${level.prefix}-pre`);
         const contentBtn = document.getElementById(`${level.prefix}-ppt`);
         const postBtn = document.getElementById(`${level.prefix}-post`);
         const assignBtn = document.getElementById(`${level.prefix}-assign`);
 
         if (preDone) {
-            preBtn.classList.add('completed');
-            preBtn.classList.remove('locked');
-            contentBtn.classList.add('unlocked');
-            contentBtn.classList.remove('locked');
-            postBtn.classList.add('unlocked');
-            postBtn.classList.remove('locked');
+            preBtn.classList.add('completed'); preBtn.classList.remove('locked', 'unlocked');
+            contentBtn.classList.add('unlocked'); contentBtn.classList.remove('locked');
+            postBtn.classList.add('unlocked'); postBtn.classList.remove('locked');
             levelCompletion += 25;
+            totalStepsCompleted += 1;
             nextStep = 'Content';
         } else {
-            contentBtn.classList.add('locked');
-            postBtn.classList.add('locked');
-            assignBtn.classList.add('locked');
+            preBtn.classList.add('unlocked'); preBtn.classList.remove('locked');
+            contentBtn.classList.add('locked'); postBtn.classList.add('locked'); assignBtn.classList.add('locked');
+            nextStep = 'Pre-Assessment';
         }
 
-        if (contentDone) {
-            contentBtn.classList.add('completed');
-            contentBtn.classList.remove('locked');
-            levelCompletion += 25;
+        // Implicit pass if next item is completed
+        if (contentDone || postDone) {
+            contentBtn.classList.add('completed'); contentBtn.classList.remove('locked', 'unlocked');
+            levelCompletion = Math.max(levelCompletion, 50);
+            if(contentDone) totalStepsCompleted += 1;
         }
 
         if (postDone) {
-            postBtn.classList.add('completed');
-            postBtn.classList.remove('locked');
-            assignBtn.classList.add('unlocked');
-            assignBtn.classList.remove('locked');
-            levelCompletion += 25;
+            postBtn.classList.add('completed'); postBtn.classList.remove('locked', 'unlocked');
+            assignBtn.classList.add('unlocked'); assignBtn.classList.remove('locked');
+            levelCompletion = Math.max(levelCompletion, 75);
+            totalStepsCompleted += 1;
             nextStep = 'Assignment';
         }
 
         if (assignDone) {
-            assignBtn.classList.add('completed');
-            assignBtn.classList.remove('locked');
-            levelCompletion += 25;
+            assignBtn.classList.add('completed'); assignBtn.classList.remove('locked', 'unlocked');
+            levelCompletion = 100;
+            totalStepsCompleted += 1;
             nextStep = '✓ Complete';
-            totalCompleted++;
-
+            
             const statusTag = document.getElementById(`status-${level.prefix}`);
-            statusTag.textContent = 'Completed';
-            statusTag.className = 'level-status completed';
+            if(statusTag) {
+                statusTag.textContent = 'Completed';
+                statusTag.className = 'level-status completed';
+            }
         }
 
-        // Update level completion percentage
         document.getElementById(`${level.prefix}-completion`).textContent = levelCompletion + '%';
         document.getElementById(`${level.prefix}-next`).textContent = nextStep;
     });
 
-    updateOverallProgress(totalCompleted);
-    checkFullCompletion();
+    // 2. Evaluate Final Assessment Logic
+    const isAdvComplete = localStorage.getItem("react_adv_assign_completed");
+    const isFinalMcqDone = localStorage.getItem("final_mcq_completed");
+    const isFinalPracticalDone = localStorage.getItem("final_assessment_completed"); 
+
+    const finalMcqBtn = document.getElementById("final-mcq");
+    const finalPracticalBtn = document.getElementById("final-practical");
+    const finalCompletionText = document.getElementById("final-completion");
+    const finalStatusTag = document.getElementById("status-final");
+
+    let finalCompletionPercentage = 0;
+
+    // Unlock Final Exam if Level 3 Assignment is done
+    if (isAdvComplete) {
+        finalStatusTag.textContent = 'In Progress';
+        
+        if (isFinalMcqDone) {
+            finalMcqBtn.classList.add('completed');
+            finalMcqBtn.classList.remove('locked', 'unlocked');
+            totalStepsCompleted += 1;
+            finalCompletionPercentage += 50;
+
+            // Unlock practical
+            if (isFinalPracticalDone) {
+                finalPracticalBtn.classList.add('completed');
+                finalPracticalBtn.classList.remove('locked', 'unlocked');
+                totalStepsCompleted += 1;
+                finalCompletionPercentage += 50;
+                finalStatusTag.textContent = '✓ Passed';
+            } else {
+                finalPracticalBtn.classList.add('unlocked');
+                finalPracticalBtn.classList.remove('locked', 'completed');
+            }
+        } else {
+            // First step is MCQ
+            finalMcqBtn.classList.add('unlocked');
+            finalMcqBtn.classList.remove('locked', 'completed');
+            finalPracticalBtn.classList.add('locked');
+            finalPracticalBtn.classList.remove('unlocked', 'completed');
+        }
+    } else {
+        // Lock both final components
+        finalMcqBtn.classList.add('locked');
+        finalMcqBtn.classList.remove('unlocked', 'completed');
+        finalPracticalBtn.classList.add('locked');
+        finalPracticalBtn.classList.remove('unlocked', 'completed');
+        finalStatusTag.textContent = 'Locked';
+    }
+
+    finalCompletionText.textContent = finalCompletionPercentage + '%';
+
+    updateOverallProgress(totalStepsCompleted);
+    checkFullCompletion(isFinalPracticalDone);
 }
 
 //////////////////////////
 // UPDATE OVERALL PROGRESS
 //////////////////////////
 
-function updateOverallProgress(completed) {
-    const total = 12; // 4 steps × 3 levels
-    const progressPercent = Math.round((completed * 4 / total) * 100);
+function updateOverallProgress(completedSteps) {
+    const totalSteps = 14; // 4 steps × 3 levels + 2 Final Assessment parts
+    // Ensure we don't exceed total (failsafe for dirty states)
+    completedSteps = Math.min(completedSteps, totalSteps); 
+    
+    const progressPercent = Math.round((completedSteps / totalSteps) * 100);
     
     document.getElementById('overall-progress').style.width = progressPercent + '%';
-    document.getElementById('progress-completed').textContent = completed * 4 + '/' + total;
+    document.getElementById('progress-completed').textContent = completedSteps + '/' + totalSteps;
     document.getElementById('progress-percent').textContent = progressPercent + '%';
 }
 
@@ -955,13 +938,9 @@ function updateOverallProgress(completed) {
 // 🔥 FINAL COMPLETION CHECK
 //////////////////////////
 
-function checkFullCompletion() {
-    const allDone =
-        localStorage.getItem("react_basics_assign_completed") &&
-        localStorage.getItem("react_int_assign_completed") &&
-        localStorage.getItem("react_adv_assign_completed");
-
-    if (allDone) {
+function checkFullCompletion(isFinalPracticalDone) {
+    const isAcknowledged = localStorage.getItem('course_fully_acknowledged');
+    if (isFinalPracticalDone && !isAcknowledged && !document.getElementById('completion-banner').classList.contains('active')) {
         setTimeout(() => completeCourse(), 500);
     }
 }

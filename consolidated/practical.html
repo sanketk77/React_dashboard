@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="../scormdriver.js"></script>
-    <script src="../APIWrapper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React Basics — Task Manager Project</title>
+    <title>Final Assessment (Part 2) — React Practical Mastery</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
@@ -22,6 +20,9 @@
             --warning: #f57c00;
             --error: #d32f2f;
             --error-light: #ffebee;
+            --final: #673ab7;
+            --final-light: #f3e5f5;
+            --final-dark: #512da8;
             --bg: #f8f9fa;
             --bg-light: #ffffff;
             --text-main: #202124;
@@ -67,105 +68,40 @@
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         }
 
-        .sidebar-logo {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .logo-img {
-            width: 160px;
-            height: auto;
-            display: block;
-            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
-            transition: transform 0.3s ease;
-        }
-
+        .logo-img { width: 160px; height: auto; display: block; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1)); transition: transform 0.3s ease; }
         .logo-img:hover { transform: scale(1.05); }
 
-        .sidebar-content {
-            padding: 30px 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
+        .sidebar-content { padding: 30px 20px; flex: 1; display: flex; flex-direction: column; gap: 30px; }
 
         .progress-section {
-            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f7ff 100%);
+            background: linear-gradient(135deg, var(--final-light) 0%, #f0f7ff 100%);
             padding: 20px;
             border-radius: 12px;
-            border-left: 4px solid var(--primary);
+            border-left: 4px solid var(--final);
         }
 
-        .progress-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .progress-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .progress-bar-small {
-            width: 100%;
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            margin-top: 12px;
-            overflow: hidden;
-        }
-
-        .progress-fill-small {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            transition: width 0.4s ease;
-        }
+        .progress-label { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .progress-value { font-size: 24px; font-weight: 700; color: var(--final); }
+        .progress-bar-small { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 12px; overflow: hidden; }
+        .progress-fill-small { height: 100%; background: linear-gradient(90deg, var(--final) 0%, var(--final-dark) 100%); transition: width 0.4s ease; }
 
         .sidebar-nav { margin-top: auto; }
-        .sidebar-nav a {
-            display: flex; align-items: center; gap: 8px; padding: 12px 16px; text-decoration: none; color: var(--text-main); border-radius: 8px; transition: all 0.3s ease; font-size: 14px; font-weight: 500;
-        }
-        .sidebar-nav a:hover { background: var(--primary-light); color: var(--primary); transform: translateX(-4px); }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 12px 16px; text-decoration: none; color: var(--text-main); border-radius: 8px; transition: all 0.3s ease; font-size: 14px; font-weight: 500; }
+        .sidebar-nav a:hover { background: var(--error-light); color: var(--error); transform: translateX(-4px); }
 
         /* ===== MAIN CONTENT ===== */
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 40px;
-            overflow-y: auto;
-            max-width: 1100px;
-        }
+        .main-content { flex: 1; margin-left: 280px; padding: 40px; overflow-y: auto; max-width: 1100px; }
 
         .header { margin-bottom: 40px; animation: fadeInDown 0.5s ease; }
-
-        .badge {
-            display: inline-block; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: linear-gradient(135deg, var(--primary-light) 0%, #d2e3fc 100%); color: var(--primary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
-        }
-
+        .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: linear-gradient(135deg, var(--final-light) 0%, #e1bee7 100%); color: var(--final); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(103, 58, 183, 0.1); }
         .header h1 { font-size: 36px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; letter-spacing: -0.5px; }
         .header p { font-size: 16px; color: var(--text-sub); line-height: 1.6; }
 
         /* ===== ASSIGNMENT CARD ===== */
-        .assignment-card {
-            background: var(--bg-light); border-radius: 16px; padding: 32px; box-shadow: var(--shadow); display: none; border: 1px solid var(--border); animation: fadeIn 0.4s ease;
-        }
-
+        .assignment-card { background: var(--bg-light); border-radius: 16px; padding: 32px; box-shadow: var(--shadow); display: none; border: 1px solid var(--border); animation: fadeIn 0.4s ease; }
         .assignment-card.active { display: block; }
-
-        .task-topic {
-            display: inline-block; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 6px; background: var(--primary-light); color: var(--primary); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-
-        .instruction {
-            font-size: 16px; line-height: 1.6; color: var(--text-main); margin-bottom: 24px; padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid var(--primary);
-        }
+        .task-topic { display: inline-block; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 6px; background: var(--final-light); color: var(--final); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .instruction { font-size: 16px; line-height: 1.6; color: var(--text-main); margin-bottom: 24px; padding: 20px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid var(--final); }
 
         .editor-section { margin-bottom: 24px; }
         .editor-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -193,19 +129,22 @@
         /* ===== IDE BUTTONS ===== */
         .ide-section { display: flex; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
         .ide-btn { flex: 1; padding: 12px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-light); color: var(--text-main); cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
-        .ide-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
+        .ide-btn:hover { border-color: var(--final); color: var(--final); background: var(--final-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(103, 58, 183, 0.2); }
 
         /* ===== CONTROLS ===== */
         .controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); flex-wrap: wrap; }
         button { padding: 12px 28px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-light); cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text-main); }
-        button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
+        button:hover:not(:disabled) { border-color: var(--final); color: var(--final); background: var(--final-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(103, 58, 183, 0.2); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); font-weight: 700; }
-        .btn-primary:hover { box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4); transform: translateY(-2px); }
+        .btn-primary:hover { box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4); transform: translateY(-2px); border-color: transparent; color: white;}
         
         .btn-success { background: linear-gradient(135deg, var(--success) 0%, #2e7d32 100%); color: white; border: none; box-shadow: 0 4px 12px rgba(30, 142, 62, 0.3); font-weight: 700; }
-        .btn-success:hover { box-shadow: 0 6px 16px rgba(30, 142, 62, 0.4); transform: translateY(-2px); }
+        .btn-success:hover { box-shadow: 0 6px 16px rgba(30, 142, 62, 0.4); transform: translateY(-2px); border-color: transparent; color: white;}
+
+        .btn-final { background: linear-gradient(135deg, var(--final) 0%, var(--final-dark) 100%); color: white; border: none; box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3); font-weight: 700;}
+        .btn-final:hover { box-shadow: 0 6px 16px rgba(103, 58, 183, 0.4); transform: translateY(-2px); border-color: transparent; color: white;}
 
         #next-btn { display: none; }
 
@@ -213,15 +152,9 @@
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) { .sidebar { width: 260px; } .main-content { margin-left: 260px; padding: 30px; } .header h1 { font-size: 28px; } }
         @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); } .sidebar-content { flex-direction: row; gap: 20px; } .main-content { margin-left: 0; padding: 20px; max-width: 100%; } .header h1 { font-size: 24px; } .assignment-card { padding: 20px; } .controls { flex-direction: column; } button { width: 100%; justify-content: center; } .ide-section { flex-direction: column; } .CodeMirror { height: 250px !important; } }
-        
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
     </style>
 </head>
 <body>
@@ -236,7 +169,7 @@
 
     <div class="sidebar-content">
         <div class="progress-section">
-            <div class="progress-label">📊 Task Progress</div>
+            <div class="progress-label">Part 2 Progress</div>
             <div class="progress-value" id="progress-text">1 / 10</div>
             <div class="progress-bar-small">
                 <div class="progress-fill-small" id="progress-fill" style="width: 10%"></div>
@@ -244,104 +177,96 @@
         </div>
 
         <nav class="sidebar-nav" style="margin-top: auto;">
-            <a href="../index.html">← Exit to Dashboard</a>
+            <a href="../index.html">← Abort Assessment</a>
         </nav>
     </div>
 </div>
 
 <div class="main-content">
     <div class="header">
-        <div class="badge">💻 Practical Project</div>
-        <h1>Building a React Task Manager</h1>
-        <p>Implement core logic to build a fully functional Task Manager app using React foundations. Submit to view the best-practice answer.</p>
+        <div class="badge">🏆 Final Exam - Part 2</div>
+        <h1>Practical Coding Mastery</h1>
+        <p>Complete these 10 comprehensive tasks to prove your ability to build production React systems. Submitting the final task completes your certification.</p>
     </div>
 
     <div id="assignment-container"></div>
 
     <div class="controls">
         <button id="prev-btn" onclick="move(-1)" disabled>← Previous</button>
-        <button id="submit-code-btn" class="btn-success" onclick="submitCode()">Submit & Review →</button>
+        <button id="submit-code-btn" class="btn-success" onclick="submitCode()">Submit & Check →</button>
         <button id="next-btn" class="btn-primary" onclick="move(1)">Next Task →</button>
     </div>
 </div>
 
 <script>
-    // React Challenges
+    // 10 Comprehensive Final React Coding Tasks
     const tasks = [
         {
-            topic: "1. Create the App Component",
-            instruction: "Define a functional component named 'TaskManager' that returns a div containing an h1 with the text 'My Tasks'.",
-            solution: "const TaskManager = () => {\n  return (\n    <div>\n      <h1>My Tasks</h1>\n    </div>\n  );\n};",
-            explanation: "Every React app starts with a root component that returns JSX."
+            topic: "1. Debounced Search with useTransition",
+            instruction: "You have a search input that filters 10,000 items. Fast typing causes the UI to freeze. Write a component where the input updates immediately, but the filtered results update inside a `startTransition` block. Show a `<Spinner/>` when `isPending` is true.",
+            solution: "const [isPending, startTransition] = useTransition();\nconst [query, setQuery] = useState('');\n\nconst handleChange = (e) => {\n  startTransition(() => setQuery(e.target.value));\n};\n\nreturn <>{isPending ? <Spinner/> : <List q={query}/>}</>;",
+            explanation: "useTransition marks state updates as non-urgent, keeping the UI responsive during expensive filtering operations."
         },
         {
-            topic: "2. Initialize Task State",
-            instruction: "Use the useState hook to create a 'tasks' array. Initialize it with two strings: 'Learn React' and 'Build App'.",
-            solution: "const [tasks, setTasks] = useState(['Learn React', 'Build App']);",
-            explanation: "State allows components to remember data between renders."
+            topic: "2. Custom useForm Hook",
+            instruction: "Create a custom hook `useForm(initial)` that manages an object of `vals`, and a `handleChange` function. Also implement a `handleSubmit(cb)` function that accepts a callback and prevents default browser reload.",
+            solution: "const useForm = (initial) => {\n  const [vals, setVals] = useState(initial);\n  \n  const handleChange = (e) => \n    setVals({...vals, [e.target.name]: e.target.value});\n    \n  const handleSubmit = (cb) => (e) => {\n    e.preventDefault();\n    cb(vals);\n  };\n  \n  return { vals, handleChange, handleSubmit };\n};",
+            explanation: "Custom hooks extract reusable stateful logic, making complex forms across an enterprise app much cleaner to implement."
         },
         {
-            topic: "3. Render a List",
-            instruction: "Use the .map() method to loop through the 'tasks' state and render an <li> for each task inside a <ul>.",
-            solution: "<ul>\n  {tasks.map((task, index) => (\n    <li key={index}>{task}</li>\n  ))}\n</ul>",
-            explanation: "The 'key' prop is required when rendering lists to help React track items."
+            topic: "3. Prop Drilling with Context API",
+            instruction: "A 'Theme' preference (dark/light) is needed 5 levels deep in `UserBadge`. Create a `ThemeContext` and a `ThemeProvider`. Return the Provider wrapping `{children}`. Comment how you would consume it using `useContext`.",
+            solution: "const ThemeCtx = createContext();\n\nexport const ThemeProvider = ({children}) => {\n  const [theme, setTheme] = useState('light');\n  return (\n    <ThemeCtx.Provider value={{theme, setTheme}}>\n      {children}\n    </ThemeCtx.Provider>\n  );\n};\n\n// In UserBadge:\n// const { theme } = useContext(ThemeCtx);",
+            explanation: "Context provides a way to pass data through the component tree without passing props down manually at every level."
         },
         {
-            topic: "4. Create an Input State",
-            instruction: "Create a new state variable named 'input' using useState to track the text typed into a new task field.",
-            solution: "const [input, setInput] = useState('');",
-            explanation: "Controlled components link input values to React state."
+            topic: "4. Performance via Memoization",
+            instruction: "A `GraphComponent` re-renders every time an unrelated text box changes because they share a parent. Use `React.memo` to wrap the GraphComponent. Show how you would stabilize a function passed to it using `useCallback` in the parent.",
+            solution: "const GraphComponent = React.memo(({ data, onPointClick }) => {\n  return <Graph data={data} onClick={onPointClick} />;\n});\n\n// In Parent Component:\n// const handlePointClick = useCallback((pt) => {\n//   console.log(pt);\n// }, []);",
+            explanation: "React.memo prevents re-renders if props haven't changed. useCallback keeps function references stable across parent renders."
         },
         {
-            topic: "5. Handle Input Changes",
-            instruction: "Write a function handleChange that updates the 'input' state whenever a user types in the text box.",
-            solution: "const handleChange = (e) => {\n  setInput(e.target.value);\n};",
-            explanation: "Event handlers capture user interactions to update state."
+            topic: "5. Protected Route Guard",
+            instruction: "Write a `ProtectedRoute` wrapper component that checks for an `isAuthenticated` token (assume you have a mock `useAuth` hook). If the user is not logged in, use React Router's `<Navigate to=\"/login\" replace />` component.",
+            solution: "import { Navigate } from 'react-router-dom';\nimport { useAuth } from './hooks';\n\nconst ProtectedRoute = ({ children }) => {\n  const { isAuthenticated } = useAuth();\n  \n  if (!isAuthenticated) {\n    return <Navigate to=\"/login\" replace />;\n  }\n  \n  return children;\n};",
+            explanation: "Route guards conditionally render child components or redirect users based on authentication state."
         },
         {
-            topic: "6. Add Task Logic",
-            instruction: "Write an addTask function that takes the current 'input' and adds it to the 'tasks' array, then clears the input.",
-            solution: "const addTask = () => {\n  setTasks([...tasks, input]);\n  setInput('');\n};",
-            explanation: "Never mutate state directly; always create a new array using the spread operator."
+            topic: "6. Scalable Feature Folders",
+            instruction: "Outline the folder structure for a new `features/cart` module. Include sub-directories for components, hooks, and services, and use comments to explain why co-location is better than a layer-based approach.",
+            solution: "// src/features/cart/\n// ├── components/ (CartList.tsx, CartItem.tsx)\n// ├── hooks/      (useCart.ts)\n// ├── services/   (cartApi.ts)\n// └── index.ts    (Public API for the feature)\n\n// Co-location makes the codebase modular, \n// easier to navigate, and highly scalable.",
+            explanation: "Feature-based architecture groups related files together, preventing massive 'components' or 'hooks' folders that become unmanageable."
         },
         {
-            topic: "7. Attach the Event Handler",
-            instruction: "Create a <button> that calls the addTask function when clicked.",
-            solution: "<button onClick={addTask}>Add Task</button>",
-            explanation: "onClick triggers functions in response to user clicks."
+            topic: "7. API Request Lifecycles",
+            instruction: "Write an async function `fetchItems` inside a component. It should properly handle 'loading', 'success', and 'error' states using `setStatus(str)` and `setError(err)`. Use a try/catch block.",
+            solution: "const fetchItems = async () => {\n  setStatus('loading');\n  setError(null);\n  try {\n    const res = await api.get('/products');\n    setData(res.data);\n    setStatus('success');\n  } catch (err) {\n    setError(err.message);\n    setStatus('error');\n  }\n};",
+            explanation: "Explicitly managing API lifecycles ensures a robust UI that properly displays loaders and recovers from network failures."
         },
         {
-            topic: "8. Conditional Empty State",
-            instruction: "Use a ternary operator to show 'No tasks found' if the tasks array is empty.",
-            solution: "{tasks.length === 0 ? <p>No tasks found</p> : <TaskList /> }",
-            explanation: "Conditional rendering allows UI to adapt based on data presence."
+            topic: "8. Testing Pyramid",
+            instruction: "Describe which parts of a checkout feature you would test using comments for Unit (Vitest), Integration (RTL), and E2E (Playwright). Explain why E2E is used sparingly.",
+            solution: "// Unit (Vitest): Test calculateTotal() math logic.\n// Integration (RTL): Test <CheckoutForm /> renders and clicks.\n// E2E (Playwright): Test full UI journey to successful payment.\n\n// E2E tests are slow and prone to breaking (flaky), \n// so they are reserved only for critical user paths.",
+            explanation: "The testing pyramid prioritizes fast, cheap unit tests at the base and reserves slow, expensive E2E tests for the top."
         },
         {
-            topic: "9. Pass Props to Sub-component",
-            instruction: "Create a component 'TaskItem' and pass a 'title' prop to it from the parent TaskManager.",
-            solution: "<TaskItem title={task} />\n\nconst TaskItem = (props) => <li>{props.title}</li>;",
-            explanation: "Props are used to pass data from parent to child components."
+            topic: "9. Error Boundary Circuit Breaker",
+            instruction: "Write a custom `ErrorBoundary` class component. Implement `getDerivedStateFromError` to catch crashes, and render a 'Retry' button as a fallback UI instead of crashing the whole app.",
+            solution: "class ErrorBoundary extends React.Component {\n  state = { hasError: false };\n\n  static getDerivedStateFromError(error) {\n    return { hasError: true };\n  }\n\n  render() {\n    if (this.state.hasError) {\n      return <button onClick={() => \n        this.setState({hasError: false})}>Retry</button>;\n    }\n    return this.props.children;\n  }\n}",
+            explanation: "Error boundaries catch JavaScript errors anywhere in their child tree, preventing the white-screen-of-death for users."
         },
         {
-            topic: "10. Implementation of Fragments",
-            instruction: "Wrap your task input and list in a React Fragment to avoid extra div nodes in the DOM.",
-            solution: "return (\n  <>\n    <input />\n    <ul>{/* list */}</ul>\n  </>\n);",
-            explanation: "Fragments group elements without adding extra nodes to the HTML tree."
+            topic: "10. Server Component Boundary",
+            instruction: "Write a Next.js Server Component `Profile` that awaits a database call `db.getUser(id)`. Nest a Client Component `<FollowButton>` inside it, passing the user ID as a prop.",
+            solution: "// page.tsx (Server Component)\nimport db from './db';\nimport FollowButton from './FollowButton'; // has 'use client'\n\nexport default async function Profile({ id }) {\n  const user = await db.getUser(id);\n  \n  return (\n    <div>\n      {user.name} \n      <FollowButton userId={user.id} />\n    </div>\n  );\n}",
+            explanation: "Server Components fetch data securely on the server. Interactive Client Components can be interleaved by passing serializable props."
         }
     ];
 
     let current = 0;
     let editors = {};
 
-    // ONLOAD TRIGGER & SCORM GUARD
     window.onload = function() {
-        const postDone = localStorage.getItem('react_basics_post_completed');
-        if (!postDone) {
-            alert("Access Denied: Please complete the React Basics Final Assessment first.");
-            window.location.href = "post_assessment.html";
-            return;
-        }
-
         buildTasks();
         initializeEditors();
     };
@@ -355,8 +280,8 @@
             div.className = `assignment-card ${i === 0 ? 'active' : ''}`;
             div.id = `task-${i}`;
             div.innerHTML = `
-                <div class="task-topic">📌 ${t.topic}</div>
-                
+                <div class="task-topic">📌 Task ${i + 1} of ${tasks.length}</div>
+                <h2 style="margin-bottom:16px; color: var(--text-main); font-size: 22px;">${t.topic}</h2>
                 <div class="instruction">
                     <strong>Objective:</strong> ${t.instruction}
                 </div>
@@ -371,12 +296,8 @@
                 </div>
 
                 <div class="ide-section">
-                    <a href="https://codesandbox.io/s/react-new" target="_blank" class="ide-btn">
-                        🌐 Try on CodeSandbox
-                    </a>
-                    <a href="https://replit.com/new/react-javascript" target="_blank" class="ide-btn">
-                        💻 Try on Replit
-                    </a>
+                    <a href="https://codesandbox.io/s/react-new" target="_blank" class="ide-btn">🌐 Try on CodeSandbox</a>
+                    <a href="https://replit.com/new/react-javascript" target="_blank" class="ide-btn">💻 Try on Replit</a>
                 </div>
 
                 <div class="solution-box" id="sol-${i}">
@@ -400,7 +321,6 @@
                 lineWrapping: true
             });
 
-            // Limit paste to 20 lines (React tasks might be slightly longer)
             editors[i].on('paste', (instance, event) => {
                 const clipboardData = event.clipboardData || window.clipboardData;
                 const pastedText = clipboardData.getData('Text');
@@ -416,7 +336,6 @@
                 }
             });
 
-            // Monitor line count
             editors[i].on('change', (instance) => {
                 const lines = instance.lineCount();
                 if (lines > 20) {
@@ -429,7 +348,6 @@
             });
         });
         
-        // Ensure the first editor renders correctly immediately
         setTimeout(() => editors[0].refresh(), 100);
     }
 
@@ -453,22 +371,23 @@
             return;
         }
 
-        // Show solution
         document.getElementById(`sol-${current}`).classList.add('show');
         document.getElementById('submit-code-btn').style.display = 'none';
         document.getElementById('next-btn').style.display = 'flex';
 
-        // Update button text if last task
+        // ==========================================
+        // 🔥 CRITICAL COMPLETION LOGIC
+        // ==========================================
         if (current === tasks.length - 1) {
             const nextBtn = document.getElementById('next-btn');
-            nextBtn.innerHTML = "Finish Project Lab <i class='fas fa-check-circle' style='margin-left:8px;'></i>";
+            nextBtn.innerHTML = "Finish & Get Certified <i class='fas fa-award' style='margin-left:8px;'></i>";
             nextBtn.classList.remove('btn-primary');
-            nextBtn.classList.add('btn-success');
+            nextBtn.classList.add('btn-final'); // Purple final button
             
             nextBtn.onclick = () => {
-                localStorage.setItem('react_basics_assign_completed', 'true');
-                alert("Congratulations! Project Lab Completed.");
-                window.location.href = '../index.html';
+                // SET THE FLAG TO TRIGGER THE DASHBOARD BANNER
+                localStorage.setItem('final_assessment_completed', 'true');
+                window.location.href = '../index.html'; 
             };
         }
 
@@ -476,27 +395,21 @@
     }
 
     function move(dir) {
-        // Hide current task
         document.getElementById(`task-${current}`).classList.remove('active');
         clearStatus(current);
         
-        // Update index
         current = Math.max(0, Math.min(tasks.length - 1, current + dir));
         
-        // Show new task
         document.getElementById(`task-${current}`).classList.add('active');
         
-        // UI Updates
         const progress = Math.round(((current + 1) / tasks.length) * 100);
         document.getElementById('progress-text').textContent = `${current + 1} / ${tasks.length}`;
         document.getElementById('progress-fill').style.width = progress + '%';
         document.getElementById('prev-btn').disabled = (current === 0);
         
-        // Reset buttons
         document.getElementById('submit-code-btn').style.display = 'flex';
         document.getElementById('next-btn').style.display = 'none';
 
-        // Refresh editor so CodeMirror renders properly when un-hidden
         setTimeout(() => editors[current].refresh(), 50);
     }
 </script>

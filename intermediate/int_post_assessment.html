@@ -21,9 +21,9 @@
             --text-sub: #5f6368;
             --text-light: #80868b;
             --border: #dadce0;
-            --code-bg: #282c34;
             --shadow: 0 2px 8px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --code-bg: #282c34;
         }
 
         * { 
@@ -66,6 +66,12 @@
             align-items: center;
             border-bottom: 1px solid var(--border);
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .sidebar-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
         .logo-img {
@@ -163,10 +169,6 @@
             transition: all 0.3s ease;
             font-size: 14px;
             font-weight: 500;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            width: 100%;
         }
 
         .sidebar-nav a:hover {
@@ -268,6 +270,11 @@
             animation: shimmer 2s infinite;
         }
 
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
         /* ===== QUESTION CARD ===== */
         .qcard {
             background: var(--bg-light);
@@ -311,7 +318,7 @@
             font-size: 20px;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 16px;
+            margin-bottom: 0;
             line-height: 1.5;
             letter-spacing: -0.3px;
         }
@@ -337,7 +344,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 10px;
+            margin-top: 28px;
         }
 
         .opt {
@@ -625,7 +632,7 @@
         }
 
         .exp-box {
-            background: rgba(0,0,0,0.03);
+            background: rgba(255,255,255,0.6);
             padding: 12px 16px;
             border-radius: 8px;
             margin-top: 12px;
@@ -655,7 +662,7 @@
 
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
-            .sidebar-content { flex-direction: row; gap: 20px; padding: 20px; }
+            .sidebar-content { flex-direction: row; gap: 20px; }
             .main-content { margin-left: 0; padding: 20px; max-width: 100%; }
             .header h1 { font-size: 24px; }
             .qcard { padding: 20px; min-height: auto; }
@@ -679,20 +686,23 @@
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <img src="jade_logo.webp" alt="Jade Global Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div style="display:none; font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">JADE GLOBAL AI</div>
+            <div style="display:none; font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">JADE GLOBAL</div>
         </div>
     </div>
+
     <div class="sidebar-content">
         <div class="timer-section">
             <div class="timer-label">⏱ Time Remaining</div>
             <div id="qtimer" class="timer-value">20:00</div>
         </div>
+
         <div class="answered-section">
             <div class="answered-label">✓ Answered</div>
             <div class="answered-count" id="ans-num">0 / 20</div>
         </div>
+
         <nav class="sidebar-nav">
-            <a href="index.html">← Exit to Dashboard</a>
+            <a href="index.html">← Exit Assessment</a>
         </nav>
     </div>
 </div>
@@ -701,8 +711,8 @@
     <div id="quiz-ui">
         <div class="header">
             <div class="badge">Module 2: Advanced State</div>
-            <h1>Intermediate Final Assessment</h1>
-            <p class="subtitle">Validate your understanding of Context, Custom Hooks, and Performance Optimization.</p>
+            <h1>Intermediate Post-Assessment</h1>
+            <p>Validate your mastery of Context, Custom Hooks, and Performance Optimization.</p>
         </div>
 
         <div class="progress-container">
@@ -720,7 +730,7 @@
         <div class="nav-controls">
             <button id="prev-btn" onclick="nav(-1)" disabled>← Previous</button>
             <div id="submit-row">
-                <button class="btn-submit" onclick="submitAssessment()">Submit Results →</button>
+                <button class="btn-submit" onclick="submitAssessment()">Check My Results →</button>
             </div>
             <button id="next-btn" onclick="nav(1)">Next →</button>
         </div>
@@ -730,32 +740,6 @@
 </div>
 
 <script>
-// ==========================================
-// 1. STRICT AUTO-REDIRECT GATEKEEPER 
-// ==========================================
-window.onload = function() {
-    const preDone = localStorage.getItem('react_int_pre_completed');
-    const contentDone = localStorage.getItem('react_int_content_completed'); 
-    
-    // Check 1: Did they skip the Pre-Assessment entirely?
-    if (!preDone) {
-        alert("🔒 Access Denied: You must complete the Intermediate Pre-Assessment first.");
-        window.location.href = "int_pre_assessment.html";
-        return; // Stops script execution
-    }
-    
-    // Check 2: Did they skip the Learning Content?
-    if (!contentDone) {
-        alert("🔒 Access Denied: Please review the Intermediate Learning Materials before taking this Final Assessment.");
-        window.location.href = "int_content.html";
-        return; // Stops script execution
-    }
-    
-    // If both checks pass, build the quiz!
-    buildQuestions();
-    startTimer();
-};
-
 const QS = [
     {
         topic: "State Management",
@@ -906,6 +890,26 @@ let submitted = false;
 let timeLeft = 20 * 60;
 let timerInt;
 
+window.onload = function() {
+    const preDone = localStorage.getItem('react_int_pre_completed');
+    const contentDone = localStorage.getItem('react_int_content_completed'); 
+    
+    // Gatekeeper Checks
+    if (!preDone) {
+        alert("🔒 Access Denied: You must complete the Intermediate Pre-Assessment first.");
+        window.location.href = "int_pre_assessment.html";
+        return;
+    }
+    if (!contentDone) {
+        alert("🔒 Access Denied: Please review the Intermediate Learning Materials before taking this Final Assessment.");
+        window.location.href = "int_content.html";
+        return;
+    }
+    
+    buildQuestions();
+    startTimer();
+};
+
 function buildQuestions() {
     const c = document.getElementById('questions-container');
     QS.forEach((q, i) => {
@@ -915,7 +919,7 @@ function buildQuestions() {
         d.innerHTML = `
             <div class="qcard-header">
                 <div class="topic-label">📌 ${q.topic}</div>
-                <div class="qnum">Question ${i + 1} of ${QS.length}</div>
+                <div class="qnum">Question ${i+1} of ${QS.length}</div>
                 <div class="qtext">${q.q}</div>
                 ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
             </div>
@@ -944,6 +948,7 @@ function selectOpt(qi, oi) {
     document.getElementById('prog').style.width = progPct + '%';
     document.getElementById('prog-text').textContent = progPct + '%';
     
+    // Show submit button when all questions are answered
     if (answeredCount === QS.length) {
         document.getElementById('submit-row').style.display = 'block';
     }
@@ -958,21 +963,19 @@ function nav(dir) {
 }
 
 function submitAssessment() {
-    if (submitted) return;
-    submitted = true; 
+    if(submitted) return;
+    submitted = true;
     clearInterval(timerInt);
-    
-    // UNLOCK: Mark React Intermediate Post-Assessment as complete to unlock project
     localStorage.setItem('react_int_post_completed', 'true');
     showResults();
 }
 
 function showResults() {
     document.getElementById('quiz-ui').style.display = 'none';
-    const r = document.getElementById('results'); 
+    const r = document.getElementById('results');
     r.style.display = 'block';
     
-    let correct = 0; 
+    let correct = 0;
     QS.forEach((q, i) => { if (answered[i] === q.ans) correct++; });
     const pct = Math.round((correct / QS.length) * 100);
 
@@ -982,9 +985,9 @@ function showResults() {
 
     r.innerHTML = `
         <div class="results-header">
-            <h2>🎉 Assessment Complete</h2>
+            <h2>🎉 Post-Assessment Complete</h2>
             <div class="score-big">${pct}%</div>
-            <p class="results-subtitle">${pct >= 70 ? 'Well done! You have unlocked the Practical Coding Assignment.' : 'Review the feedback below to prepare for the practical lab.'}</p>
+            <p class="results-subtitle">${pct >= 70 ? 'Excellent work! The Practical Coding Assignment is now unlocked.' : 'Review your technical logic below to prepare for the practical lab.'}</p>
         </div>
 
         <div class="result-grid">
@@ -993,24 +996,25 @@ function showResults() {
                 <div class="stat-label">Correct</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--error)">${QS.length - correct}</div>
+                <div class="stat-value" style="color:var(--error)">${QS.length - correct}</div>
                 <div class="stat-label">Incorrect</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--primary)">${timeStr}</div>
-                <div class="stat-label">Duration</div>
+                <div class="stat-value">${timeStr}</div>
+                <div class="stat-label">Time Taken</div>
             </div>
         </div>
 
         <div class="action-buttons">
             <button class="btn-submit" onclick="window.location.href='index.html'" style="background: var(--bg-light); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;">← Return to Dashboard</button>
-            <button class="btn-submit" onclick="window.location.href='int_assignment.html'">Go to Practical Assignment →</button>
+            <button class="btn-submit" onclick="window.location.href='int_assignment.html'">💻 Proceed to Coding Assignment →</button>
         </div>
 
         <div class="review-section">
-            <h3>📋 Review Responses</h3>
+            <h3>📋 Review Your Logic</h3>
             ${QS.map((q, i) => {
-                const ua = answered[i]; const ok = ua === q.ans;
+                const ua = answered[i];
+                const ok = ua === q.ans;
                 return `
                 <div class="review-card ${ok ? 'correct' : 'incorrect'}">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
@@ -1018,7 +1022,7 @@ function showResults() {
                         <div class="review-qtext">Question ${i + 1}</div>
                     </div>
                     <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-main);">${q.q}</div>
-                    ${q.code ? `<div class="code-block" style="margin-bottom: 12px; margin-top: 0;">${q.code}</div>` : ''}
+                    ${q.code ? `<div class="code-block" style="margin-bottom:12px; margin-top:0">${q.code}</div>` : ''}
                     <div class="review-item">Your Answer: <strong>${ua !== undefined ? q.opts[ua] : 'Not answered'}</strong></div>
                     ${!ok ? `<div class="review-item correct">✓ Correct: ${q.opts[q.ans]}</div>` : ''}
                     <div class="exp-box">💡 <strong>Technical Logic:</strong> ${q.exp}</div>
@@ -1032,20 +1036,20 @@ function startTimer() {
     timerInt = setInterval(() => {
         timeLeft--;
         const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-        const display = document.getElementById('qtimer');
-        display.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        const timerDisplay = document.getElementById('qtimer');
+        timerDisplay.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
         
         if (timeLeft <= 60) {
-            display.classList.add('warning');
+            timerDisplay.classList.add('warning');
         }
         if (timeLeft <= 30) {
-            display.classList.remove('warning');
-            display.classList.add('critical');
+            timerDisplay.classList.remove('warning');
+            timerDisplay.classList.add('critical');
         }
         
         if (timeLeft <= 0) {
             clearInterval(timerInt);
-            alert("⏱ Time is up! Submitting your final assessment.");
+            alert("⏱ Time is up! Submitting your answers...");
             submitAssessment();
         }
     }, 1000);
