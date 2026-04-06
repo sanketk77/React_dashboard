@@ -6,222 +6,493 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React Advanced — Capstone Project</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+
     <style>
         :root {
             --primary: #1a73e8;
-            --success: #2e7d32;
+            --primary-light: #e8f0fe;
+            --primary-dark: #1557b0;
+            --success: #1e8e3e;
+            --success-light: #f1f8e9;
+            --warning: #f57c00;
+            --error: #d32f2f;
+            --error-light: #ffebee;
             --bg: #f8f9fa;
+            --bg-light: #ffffff;
             --text-main: #202124;
-            --white: #ffffff;
-            --border: #e0e0e0;
-            --code-bg: #1e1e1e;
+            --text-sub: #5f6368;
+            --text-light: #80868b;
+            --border: #dadce0;
+            --code-bg: #282c34;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Google Sans', Arial, sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+        
+        html, body {
+            height: 100%;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f8 100%);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== LOCK OVERLAY ===== */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .lock-card {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: var(--shadow-lg); max-width: 450px; border: 1px solid var(--border);
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .lock-icon { font-size: 64px; margin-bottom: 20px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-light);
+            border-right: 1px solid var(--border);
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
 
         .sidebar-header {
-    padding: 20px;
-    display: flex;
-    justify-content: center; /* Centers the logo horizontally */
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 20px;
-}
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
 
-.sidebar-logo {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
+        .logo-img { width: 160px; height: auto; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1)); }
 
-.logo-img {
-    width: 180px;      /* Adjust this width based on your PNG's dimensions */
-    height: auto;      /* Maintains aspect ratio */
-    display: block;
-    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1)); /* Optional: adds a soft shadow */
-}
+        .sidebar-content { padding: 30px 20px; flex: 1; display: flex; flex-direction: column; gap: 30px; }
 
-        .header { margin-bottom: 2rem; }
-        .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 4px; background: #e8f0fe; color: #1967d2; text-transform: uppercase; margin-bottom: 1rem; }
+        .progress-section {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #f0f7ff 100%);
+            padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary);
+        }
+
+        .progress-label {
+            font-size: 11px; font-weight: 700; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+        }
+
+        .progress-value { font-size: 24px; font-weight: 700; color: var(--primary); }
+
+        .progress-bar-small {
+            width: 100%; height: 6px; background: var(--border);
+            border-radius: 3px; margin-top: 12px; overflow: hidden;
+        }
         
-        .progress-bar { height: 6px; background: #dadce0; border-radius: 3px; margin-bottom: 2rem; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+        .progress-fill-small {
+            height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            transition: width 0.4s ease;
+        }
 
-        .challenge-card { background: var(--white); border-radius: 16px; padding: 2.5rem; border: 1px solid var(--border); display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .challenge-card.active { display: block; animation: fadeIn 0.4s ease; }
+        .sidebar-nav { margin-top: auto; padding-bottom: 20px; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+            text-decoration: none; color: var(--text-main); border-radius: 8px;
+            transition: all 0.3s ease; font-size: 14px; font-weight: 500;
+        }
+        .sidebar-nav a:hover { background: var(--primary-light); color: var(--primary); transform: translateX(-4px); }
 
-        .editor-label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: block; }
-        textarea { width: 100%; height: 280px; background: var(--code-bg); color: #dcdcdc; padding: 1.5rem; border-radius: 8px; font-family: 'Courier New', monospace; border: none; outline: none; margin-bottom: 1.5rem; font-size: 0.9rem; border: 1px solid #333; }
+        /* ===== MAIN CONTENT ===== */
+        .main-content { flex: 1; margin-left: 280px; padding: 40px; max-width: 1100px; }
 
-        .solution-area { display: none; background: #f1f8e9; border-left: 5px solid var(--success); padding: 1.5rem; border-radius: 8px; margin-top: 1rem; }
-        pre { white-space: pre-wrap; font-size: 0.85rem; margin-top: 10px; line-height: 1.5; font-family: 'Courier New', monospace; }
+        .header { margin-bottom: 40px; animation: fadeInDown 0.5s ease; }
+        .badge {
+            display: inline-block; font-size: 11px; font-weight: 700; padding: 6px 14px;
+            border-radius: 20px; background: linear-gradient(135deg, var(--primary-light) 0%, #d2e3fc 100%);
+            color: var(--primary); margin-bottom: 16px; text-transform: uppercase;
+            letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(26, 115, 232, 0.1);
+        }
 
-        .nav-controls { display: flex; justify-content: space-between; margin-top: 2rem; }
-        button { padding: 12px 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-weight: 500; transition: 0.2s; }
-        .btn-submit { background: var(--primary); color: white; border: none; }
-        .btn-submit:hover { background: #174ea6; }
+        h1 { font-size: 32px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; letter-spacing: -0.5px; }
+        .subtitle { font-size: 16px; color: var(--text-sub); line-height: 1.6; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+        /* ===== ASSIGNMENT CARD ===== */
+        .challenge-card {
+            background: var(--bg-light); border-radius: 16px; padding: 32px;
+            box-shadow: var(--shadow); display: none; border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease;
+        }
+        .challenge-card.active { display: block; }
+
+        .task-topic {
+            display: inline-block; font-size: 11px; font-weight: 700; padding: 6px 14px;
+            border-radius: 6px; background: var(--primary-light); color: var(--primary);
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .instruction-box {
+            font-size: 16px; line-height: 1.6; color: var(--text-main);
+            margin-bottom: 24px; padding: 20px; background: #f8f9fa;
+            border-radius: 12px; border-left: 4px solid var(--primary);
+        }
+
+        /* ===== EDITOR SECTION ===== */
+        .editor-section { margin-bottom: 24px; }
+        .editor-label {
+            display: block; font-size: 13px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        .editor-wrapper {
+            border: 2px solid var(--border); border-radius: 12px; overflow: hidden;
+            box-shadow: var(--shadow); background: var(--code-bg);
+        }
+        
+        .CodeMirror {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace !important;
+            font-size: 14px !important; height: 300px !important; background: var(--code-bg) !important;
+        }
+
+        /* ===== STATUS ===== */
+        .editor-status {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: 8px; margin-top: 12px; font-size: 13px; font-weight: 600; display: none;
+        }
+        .editor-status.show { display: flex; }
+        .editor-status.error { background: linear-gradient(135deg, var(--error-light) 0%, #ffcdd2 100%); color: var(--error); border-left: 4px solid var(--error); }
+        .editor-status.success { background: linear-gradient(135deg, var(--success-light) 0%, #c8e6c9 100%); color: var(--success); border-left: 4px solid var(--success); }
+
+        /* ===== SOLUTION BOX ===== */
+        .solution-box {
+            display: none; background: linear-gradient(135deg, var(--success-light) 0%, #f1f8e9 100%);
+            padding: 24px; border-radius: 12px; border-left: 5px solid var(--success);
+            box-shadow: var(--shadow); margin-top: 24px;
+        }
+        .solution-box.show { display: block; animation: slideDown 0.4s ease; }
+        
+        .solution-title { font-size: 14px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+        .solution-code {
+            background: var(--code-bg); padding: 16px; border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace;
+            font-size: 13px; color: #abb2bf; line-height: 1.6; overflow-x: auto;
+            white-space: pre-wrap; word-wrap: break-word;
+        }
+        .solution-explanation { margin-top: 16px; font-size: 13px; color: #0d652d; line-height: 1.6; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #c8e6c9; }
+
+        /* ===== CONTROLS ===== */
+        .controls {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 28px; border-radius: 8px; border: 2px solid var(--border);
+            background: var(--bg-light); cursor: pointer; font-weight: 600; font-size: 14px;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text-main);
+        }
+        button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; border: none; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); }
+        .btn-primary:hover:not(:disabled) { color: white; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4); }
+        
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #2e7d32 100%); color: white; border: none; box-shadow: 0 4px 12px rgba(30, 142, 62, 0.3); }
+        .btn-success:hover { color: white; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(30, 142, 62, 0.4); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: static; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .controls { flex-direction: column; }
+            button { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
+<div id="lock-screen">
+    <div class="lock-card">
+        <div class="lock-icon">🔒</div>
+        <h2 style="margin-bottom: 12px;">Assignment Locked</h2>
+        <p style="color: var(--text-sub); margin-bottom: 24px; line-height: 1.5;">Please complete the <b>Advanced Post-Assessment</b> before attempting this Capstone Project.</p>
+        <button class="btn-primary" onclick="window.location.href='adv_post_assessment.html'" style="margin: 0 auto;">Take Post-Assessment</button>
+    </div>
+</div>
+
 <div class="sidebar">
-    <div style="font-weight: bold; color: var(--primary); font-size: 1.2rem;">JADE GLOBAL AI</div>
-    <div style="margin-top: 2rem;">
-        <p style="font-size: 0.8rem; text-transform: uppercase; color: #666;">Final Capstone</p>
-        <p style="font-weight: bold;">Enterprise Architecture</p>
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <img src="jade_logo.webp" alt="Jade Global Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div style="display:none; font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">JADE GLOBAL</div>
+        </div>
     </div>
-    <div style="margin-top: 2rem;">
-        <a href="../index.html" style="text-decoration:none; color:#5f6368; font-size:0.9rem;">← Exit to Dashboard</a>
-    </div>
-    <div style="margin-top: auto;">
-        <p id="prog-text" style="font-weight: bold; color: var(--primary);">0% COMPLETE</p>
+
+    <div class="sidebar-content">
+        <div class="progress-section">
+            <div class="progress-label">💻 Task Progress</div>
+            <div class="progress-value" id="progress-text">1 / 10</div>
+            <div class="progress-bar-small">
+                <div class="progress-fill-small" id="progress-fill" style="width: 10%"></div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="../index.html">← Exit Assignment</a>
+        </nav>
     </div>
 </div>
 
 <div class="main-content">
-    <div class="header">
-        <div class="badge">Module 3: Advanced</div>
-        <h1>Enterprise Dashboard Implementation</h1>
-        <p style="color: #5f6368;">Construct a high-performance, scalable React architecture.</p>
-    </div>
+    <div id="quiz-ui">
+        <div class="header">
+            <div class="badge">Module 3: Advanced</div>
+            <h1>Enterprise Architecture Capstone</h1>
+            <p class="subtitle">Construct a high-performance, scalable React architecture applying concepts from Next.js, Redux, and Context.</p>
+        </div>
 
-    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width: 0%"></div></div>
-    <div id="container"></div>
+        <div id="assignment-container"></div>
 
-    <div class="nav-controls">
-        <button id="prev-btn" onclick="nav(-1)" disabled>Previous Task</button>
-        <button id="sub-btn" class="btn-submit" onclick="submitCode()">Submit & Unlock Solution</button>
-        <button id="next-btn" onclick="nav(1)" style="display:none">Next Task</button>
+        <div class="controls">
+            <button id="prev-btn" onclick="move(-1)" disabled>← Previous</button>
+            <button id="submit-code-btn" class="btn-success" onclick="submitCode()">Submit Code & Review →</button>
+            <button id="next-btn" class="btn-primary" onclick="move(1)" style="display:none;">Next Task →</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 1. GATEKEEPER: Ensure the user passed the Advanced Post-Assessment first
-    window.onload = function() {
+    // 1. STRICT AUTO-REDIRECT GATEKEEPER 
+    document.addEventListener("DOMContentLoaded", function() {
         const postDone = localStorage.getItem('react_adv_post_completed');
         if (!postDone) {
-            alert("Access Denied: Please complete the Advanced React Assessment (Final Quiz) first.");
-            window.location.href = "adv_post_assessment.html";
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('lock-screen').style.display = 'flex';
+            return; 
+        }
+        buildTasks();
+        initializeEditors();
+    });
+
+    const DATA = [
+        {
+            t: "1. Redux Store Configuration",
+            d: "Configure a Redux store using <code>configureStore</code>. Must include a 'products' slice and use middleware for async actions.",
+            s: "import { configureStore } from '@reduxjs/toolkit';\nimport productReducer from './productSlice';\n\nexport const store = configureStore({\n  reducer: { products: productReducer }\n});",
+            exp: "This architecture ensures scalability by separating server-state from UI logic."
+        },
+        {
+            t: "2. Async Thunk for Data Fetching",
+            d: "Create a <code>createAsyncThunk</code> named 'fetchProducts' to fetch from an API and handle the fulfilled state in extraReducers.",
+            s: "export const fetchProducts = createAsyncThunk('products/fetch', async () => {\n  const res = await fetch('/api/products');\n  return res.json();\n});",
+            exp: "Thunks abstract API logic out of components, centralizing side-effects inside the state manager."
+        },
+        {
+            t: "3. React Query: useQuery",
+            d: "Implement <code>useQuery</code> with a 5-minute 'staleTime' and handle the 'isLoading' state.",
+            s: "const { data, isLoading } = useQuery({\n  queryKey: ['products'],\n  queryFn: fetchProducts,\n  staleTime: 1000 * 60 * 5\n});",
+            exp: "React Query handles caching, background fetching, and deduplication automatically."
+        },
+        {
+            t: "4. Next.js Dynamic Routing",
+            d: "Create a dynamic route for products and use <code>getStaticPaths</code> to pre-render product IDs.",
+            s: "export async function getStaticPaths() {\n  const paths = products.map(p => ({ params: { id: p.id } }));\n  return { paths, fallback: 'blocking' };\n}",
+            exp: "This generates static HTML files for each dynamic ID at build time, massively improving SEO and load times."
+        },
+        {
+            t: "5. Next.js: ISR Implementation",
+            d: "Implement <code>getStaticProps</code> with a revalidate interval of 60 seconds (Incremental Static Regeneration).",
+            s: "export async function getStaticProps({ params }) {\n  return { props: { data }, revalidate: 60 };\n}",
+            exp: "ISR updates static pages in the background automatically without needing a full rebuild."
+        },
+        {
+            t: "6. Performance: Code Splitting",
+            d: "Use <code>React.lazy</code> and <code>Suspense</code> to dynamically load a heavy chart component.",
+            s: "const HeavyChart = React.lazy(() => import('./HeavyChart'));\n\n<Suspense fallback={<Loader />}><HeavyChart /></Suspense>",
+            exp: "This prevents the client from downloading heavy libraries until they are actually rendered on screen."
+        },
+        {
+            t: "7. Custom Hook: useAnalytics",
+            d: "Create a hook that uses <code>useRouter</code> to log page views on route changes.",
+            s: "useEffect(() => {\n  router.events.on('routeChangeComplete', (url) => log(url));\n}, [router]);",
+            exp: "Custom hooks keep component logic dry and testable."
+        },
+        {
+            t: "8. Advanced Context + useReducer",
+            d: "Combine <code>useReducer</code> with Context API to manage a global notification system.",
+            s: "const [state, dispatch] = useReducer(reducer, []);\n<Context.Provider value={{ state, dispatch }}>{children}</Context.Provider>",
+            exp: "This acts as a lightweight alternative to Redux for smaller slices of complex state."
+        },
+        {
+            t: "9. Testing with RTL",
+            d: "Write a test using React Testing Library to find all list items after an async fetch.",
+            s: "test('renders items', async () => {\n  render(<App />);\n  const items = await screen.findAllByRole('listitem');\n  expect(items).toHaveLength(10);\n});",
+            exp: "Using 'findAllByRole' waits for the async API request to complete and render the new DOM nodes."
+        },
+        {
+            t: "10. Compound Components",
+            d: "Implement a Tabs system using <code>React.cloneElement</code> to pass index props.",
+            s: "React.Children.map(children, (child, index) => {\n  return React.cloneElement(child, { index });\n});",
+            exp: "Compound components share implicit state behind the scenes, creating a highly readable API for developers."
+        }
+    ];
+
+    let current = 0;
+    let editors = {};
+
+    function buildTasks() {
+        const container = document.getElementById('assignment-container');
+        DATA.forEach((t, i) => {
+            const div = document.createElement('div');
+            div.className = `challenge-card ${i === 0 ? 'active' : ''}`;
+            div.id = `task-${i}`;
+            div.innerHTML = `
+                <div class="task-topic">📌 ${t.t.split('.')[1]}</div>
+                
+                <div class="instruction-box">
+                    <strong>Objective:</strong> ${t.d}
+                </div>
+
+                <div class="editor-section">
+                    <label class="editor-label">✏️ Code Editor</label>
+                    <div class="editor-wrapper">
+                        <textarea id="editor-${i}" class="code-input"></textarea>
+                    </div>
+                    <div class="editor-status" id="status-${i}"></div>
+                </div>
+
+                <div class="solution-box" id="sol-${i}">
+                    <div class="solution-title">✓ Enterprise Architecture Solution</div>
+                    <div class="solution-code">${t.s}</div>
+                    <div class="solution-explanation"><strong>Design Principle:</strong> ${t.exp}</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function initializeEditors() {
+        DATA.forEach((t, i) => {
+            editors[i] = CodeMirror.fromTextArea(document.getElementById(`editor-${i}`), {
+                mode: 'javascript',
+                theme: 'dracula',
+                lineNumbers: true,
+                indentUnit: 2,
+                lineWrapping: true,
+                matchBrackets: true
+            });
+
+            editors[i].on('change', (instance) => {
+                const lines = instance.lineCount();
+                if (lines > 0 && instance.getValue().trim() !== '') {
+                    showStatus(i, 'success', `✓ Code registered. Ready to submit.`);
+                } else {
+                    clearStatus(i);
+                }
+            });
+        });
+    }
+
+    function showStatus(i, type, message) {
+        const status = document.getElementById(`status-${i}`);
+        status.className = `editor-status show ${type}`;
+        status.textContent = message;
+    }
+
+    function clearStatus(i) {
+        const status = document.getElementById(`status-${i}`);
+        status.classList.remove('show');
+    }
+
+    function submitCode() {
+        const code = editors[current].getValue();
+        
+        if (code.trim() === '') {
+            showStatus(current, 'error', '❌ Please write your logic before submitting.');
             return;
         }
-        build(); // Initialize tasks if gatekeeper passes
-    };
-const DATA = [
-    {
-        t: "1. Redux Store Configuration",
-        d: "Configure a Redux store using <code>configureStore</code>. Must include a 'products' slice and use middleware for async actions.",
-        s: "import { configureStore } from '@reduxjs/toolkit';\nimport productReducer from './productSlice';\n\nexport const store = configureStore({\n  reducer: { products: productReducer }\n});"
-    },
-    {
-        t: "2. Async Thunk for Data Fetching",
-        d: "Create a <code>createAsyncThunk</code> named 'fetchProducts' to fetch from an API and handle the fulfilled state in extraReducers.",
-        s: "export const fetchProducts = createAsyncThunk('products/fetch', async () => {\n  const res = await fetch('/api/products');\n  return res.json();\n});"
-    },
-    {
-        t: "3. React Query: useQuery",
-        d: "Implement <code>useQuery</code> with a 5-minute 'staleTime' and handle the 'isLoading' state.",
-        s: "const { data, isLoading } = useQuery({\n  queryKey: ['products'],\n  queryFn: fetchProducts,\n  staleTime: 1000 * 60 * 5\n});"
-    },
-    {
-        t: "4. Next.js Dynamic Routing",
-        d: "Create a dynamic route for products and use <code>getStaticPaths</code> to pre-render product IDs.",
-        s: "export async function getStaticPaths() {\n  const paths = products.map(p => ({ params: { id: p.id } }));\n  return { paths, fallback: 'blocking' };\n}"
-    },
-    {
-        t: "5. Next.js: ISR Implementation",
-        d: "Implement <code>getStaticProps</code> with a revalidate interval of 60 seconds (Incremental Static Regeneration).",
-        s: "export async function getStaticProps({ params }) {\n  return { props: { data }, revalidate: 60 };\n}"
-    },
-    {
-        t: "6. Performance: Code Splitting",
-        d: "Use <code>React.lazy</code> and <code>Suspense</code> to dynamically load a heavy chart component.",
-        s: "const HeavyChart = React.lazy(() => import('./HeavyChart'));\n\n<Suspense fallback={<Loader />}><HeavyChart /></Suspense>"
-    },
-    {
-        t: "7. Custom Hook: useAnalytics",
-        d: "Create a hook that uses <code>useRouter</code> to log page views on route changes.",
-        s: "useEffect(() => {\n  router.events.on('routeChangeComplete', (url) => log(url));\n}, [router]);"
-    },
-    {
-        t: "8. Advanced Context + useReducer",
-        d: "Combine <code>useReducer</code> with Context API to manage a global notification system.",
-        s: "const [state, dispatch] = useReducer(reducer, []);\n<Context.Provider value={{ state, dispatch }}>{children}</Context.Provider>"
-    },
-    {
-        t: "9. Testing with RTL",
-        d: "Write a test using React Testing Library to find all list items after an async fetch.",
-        s: "test('renders items', async () => {\n  render(<App />);\n  const items = await screen.findAllByRole('listitem');\n  expect(items).toHaveLength(10);\n});"
-    },
-    {
-        t: "10. Compound Components",
-        d: "Implement a Tabs system using <code>React.cloneElement</code> to pass index props.",
-        s: "React.Children.map(children, (child, index) => {\n  return React.cloneElement(child, { index });\n});"
-    }
-];
 
-let cur = 0;
-function build() {
-    const c = document.getElementById('container');
-    DATA.forEach((item, i) => {
-        const d = document.createElement('div');
-        d.className = 'challenge-card' + (i === 0 ? ' active' : '');
-        d.id = 'c' + i;
-        d.innerHTML = `
-            <h3>${item.t}</h3>
-            <p style="margin: 1.5rem 0; font-size:1.1rem; line-height:1.6;">${item.d}</p>
-            <label class="editor-label">ENTERPRISE SOLUTION ARCHITECTURE</label>
-            <textarea id="area${i}" spellcheck="false" placeholder="// Write production-grade code..."></textarea>
-            <div class="solution-area" id="sol${i}">
-                <strong style="color:var(--success)">Advanced Technical Solution:</strong>
-                <pre>${item.s}</pre>
-                <div style="margin-top:15px; padding:12px; background:#fff; border:1px solid #ddd; border-radius:8px; font-size:0.9rem;">
-                    <strong>Design Principle:</strong> This architecture ensures scalability by separating server-state from UI logic.
-                </div>
-            </div>
-        `;
-        c.appendChild(d);
-    });
-}
+        // Show solution
+        document.getElementById(`sol-${current}`).classList.add('show');
+        document.getElementById('submit-code-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'flex';
 
-function submitCode() {
-    document.getElementById('sol' + cur).style.display = 'block';
-    document.getElementById('sub-btn').style.display = 'none';
-    document.getElementById('next-btn').style.display = 'block';
-}
-
-function nav(dir) {
-    document.getElementById('c' + cur).classList.remove('active');
-    cur += dir;
-    document.getElementById('c' + cur).classList.add('active');
-    
-    document.getElementById('prev-btn').disabled = (cur === 0);
-    document.getElementById('next-btn').style.display = 'none';
-    document.getElementById('sub-btn').style.display = 'block';
-    
-    const pct = Math.round((cur / (DATA.length - 1)) * 100);
-    document.getElementById('prog-fill').style.width = pct + '%';
-    document.getElementById('prog-text').textContent = pct + '% COMPLETE';
-
-    if (cur === DATA.length - 1 && document.getElementById('sol'+cur).style.display === 'block') {
-        document.getElementById('next-btn').textContent = "Submit Capstone & Finalize SCORM";
-        document.getElementById('next-btn').onclick = () => {
+        // Final Task logic
+        if (current === DATA.length - 1) {
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.textContent = "✓ Finish & Complete Certification";
+            nextBtn.classList.remove('btn-primary');
+            nextBtn.classList.add('btn-success');
             
-            // --- SCORM FINAL REPORTING ---
-            if (typeof LMSSetValue === "function") {
-                LMSSetValue("cmi.core.score.raw", "100");
-                LMSSetValue("cmi.core.lesson_status", "passed");
-                LMSCommit();
-            }
+            nextBtn.onclick = () => {
+                localStorage.setItem('react_adv_assign_completed', 'true');
+                
+                // SCORM Communication
+                if (typeof LMSSetValue === "function") {
+                    LMSSetValue("cmi.core.score.raw", "100");
+                    LMSSetValue("cmi.core.lesson_status", "passed");
+                    LMSCommit();
+                }
+                
+                alert("🎉 Certification Complete! Your status has been reported as PASSED to the LMS.");
+                window.location.href = '../index.html';
+            };
+        }
 
-            alert("Advanced React Capstone Projects Completed! Status reported as PASSED to LMS.");
-            window.location.href = '../index.html';
-        };
+        showStatus(current, 'success', '✓ Great job! Review the reference architecture below.');
     }
-}
-window.onload = build;
+
+    function move(dir) {
+        // Hide current task
+        document.getElementById(`task-${current}`).classList.remove('active');
+        clearStatus(current);
+        
+        // Update index
+        current = Math.max(0, Math.min(DATA.length - 1, current + dir));
+        
+        // Show new task
+        document.getElementById(`task-${current}`).classList.add('active');
+        
+        // UI Updates
+        const progress = Math.round(((current + 1) / DATA.length) * 100);
+        document.getElementById('progress-text').textContent = `${current + 1} / ${DATA.length}`;
+        document.getElementById('progress-fill').style.width = progress + '%';
+        document.getElementById('prev-btn').disabled = (current === 0);
+        
+        // Reset buttons
+        document.getElementById('submit-code-btn').style.display = 'flex';
+        document.getElementById('next-btn').style.display = 'none';
+
+        // Refresh editor to prevent display glitches
+        setTimeout(() => editors[current].refresh(), 100);
+    }
 </script>
+
 </body>
 </html>

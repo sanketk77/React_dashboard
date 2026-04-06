@@ -817,7 +817,18 @@ const QS = [
     { topic: "State Management", q: "Which tool handles global state for large apps?", opts: ["useState", "Redux or Zustand", "localStorage", "JSON"], ans: 1, exp: "Redux and Zustand are popular for complex global state." },
     { topic: "Data Fetching", q: "What is a benefit of React Query?", opts: ["Replaces Routing", "Automated server-state caching and sync", "Faster CSS", "DB management"], ans: 1, exp: "React Query simplifies server-state management." },
     { topic: "State Management", q: "What is 'Lifting State Up'?", opts: ["Moving state to a common ancestor", "Deleting state", "Moving to DB", "Using HOCs"], ans: 0, exp: "Lifting state up shares data between siblings via their parent." },
-    { topic: "Global State", q: "How do you provide a value to a Context?", opts: ["<MyContext.Value>", "<MyContext.Provider value={...}>", "<MyContext provider={...}>", "useProvider()"], ans: 1, exp: "The Provider component supplies values to the tree." },
+    {
+        topic: "Global State", 
+        q: "How do you provide a value to a Context?", 
+        opts: [
+            "&lt;MyContext.Value&gt;", 
+            "&lt;MyContext.Provider value={...}&gt;", 
+            "&lt;MyContext provider={...}&gt;", 
+            "useProvider()"
+        ], 
+        ans: 1, 
+        exp: "The Provider component supplies values to the tree." 
+    },
     { topic: "React Internals", q: "Which hook accesses a DOM element directly?", opts: ["useDOM", "useRef", "useEffect", "useElement"], ans: 1, exp: "useRef is the primary way to interact with DOM nodes." },
     { topic: "React Internals", q: "What is a React 'Fragment'?", opts: ["Broken code", "Wrapper that adds no DOM nodes", "Piece of state", "Type of hook"], ans: 1, exp: "Fragments (<>...</>) group children without extra HTML." },
     { topic: "Performance", q: "What does useMemo return?", opts: ["A function", "A memoized value", "A boolean", "JSX"], ans: 1, exp: "useMemo returns the result of the function, which is then cached." },

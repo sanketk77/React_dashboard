@@ -512,7 +512,7 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="index.html">← Back to Dashboard</a>
+            <a href="../index.html">← Back to Dashboard</a>
         </nav>
     </div>
 </div>
@@ -533,12 +533,16 @@
     <div id="video-content" class="content-area active">
         <div class="card">
             <h3>📹 Advanced Lecture: Enterprise Architecture</h3>
-            <div class="video-wrapper">
-                <video controls crossorigin="anonymous">
-                    <source src="https://res.cloudinary.com/dj3shi5ju/video/upload/v1774863371/uemx7jw5jftvmilzpejj.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
+           <div class="video-wrapper">
+    <iframe 
+        src="https://drive.google.com/file/d/1qDuFi6hMnNV0hUlv_w70Bg7zbeJnA2gT/preview" 
+        width="100%" 
+        height="450" 
+        allow="autoplay; encrypted-media" 
+        allowfullscreen
+        style="border: 2px solid #eee; border-radius: 8px;">
+    </iframe>
+</div>
 
             <div class="learning-objectives">
                 <strong>Learning Objectives</strong>
@@ -567,7 +571,7 @@
     </div>
 
     <div class="footer-nav">
-        <a href="index.html" class="btn btn-outline">← Back</a>
+        <a href="../index.html" class="btn btn-outline">← Back</a>
         <button class="btn btn-primary" onclick="markComplete()">Mark as Completed →</button>
     </div>
 
@@ -586,8 +590,7 @@
             document.getElementById('lock-screen').style.display = 'flex';
             
             // Alert and Redirect
-            alert("🔒 Access Denied: Please complete the Advanced Pre-Assessment before accessing these materials.");
-            window.location.href = "adv_pre_assessment.html";
+        
         }
     });
 

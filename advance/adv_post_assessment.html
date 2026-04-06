@@ -5,7 +5,7 @@
     <script src="APIWrapper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Basics — Post-Assessment</title>
+    <title>React Advance— Post-Assessment</title>
     <style>
         :root {
             --primary: #1a73e8;
@@ -34,6 +34,7 @@
 
         html, body {
             height: 100%;
+            scroll-behavior: smooth;
         }
 
         body { 
@@ -88,6 +89,12 @@
             align-items: center;
             border-bottom: 1px solid var(--border);
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .sidebar-logo {
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
         .logo-img {
@@ -242,6 +249,13 @@
         /* ===== PROGRESS BAR ===== */
         .progress-container {
             margin-bottom: 40px;
+            position: sticky;
+            top: 0;
+            background: rgba(248, 249, 250, 0.95);
+            padding: 10px 0 20px 0;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
         }
 
         .progress-info {
@@ -282,30 +296,27 @@
         .progress-fill::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2s infinite;
         }
 
-        /* ===== QUESTION CARD ===== */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* ===== QUESTION CARDS (Scrolling Layout) ===== */
         .qcard {
             background: var(--bg-light);
             border-radius: 16px;
             padding: 32px;
             box-shadow: var(--shadow);
-            display: none;
             border: 1px solid var(--border);
-            min-height: 500px;
-            flex-direction: column;
-            justify-content: space-between;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .qcard.active {
             display: flex;
+            flex-direction: column;
+            margin-bottom: 40px; /* Spacing between cards */
+            animation: fadeIn 0.4s ease;
         }
 
         .qcard-header {
@@ -350,16 +361,12 @@
             border-left: 4px solid var(--primary);
         }
 
-        .qcard-content {
-            flex: 1;
-        }
-
         /* ===== OPTIONS ===== */
         .options {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         .opt {
@@ -379,10 +386,7 @@
         .opt::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
+            top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             transition: left 0.4s ease;
         }
@@ -394,9 +398,7 @@
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
         }
 
-        .opt:hover::before {
-            left: 100%;
-        }
+        .opt:hover::before { left: 100%; }
 
         .opt.selected {
             background: var(--primary-light);
@@ -405,18 +407,9 @@
         }
 
         .olabel {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-main);
-            background: var(--bg);
-            flex-shrink: 0;
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            font-weight: 700; color: var(--text-main); background: var(--bg); flex-shrink: 0;
             transition: all 0.3s ease;
         }
 
@@ -427,55 +420,16 @@
             box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
         }
 
-        .otext {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text-main);
-            line-height: 1.4;
-        }
+        .otext { font-size: 15px; font-weight: 500; color: var(--text-main); line-height: 1.4; }
 
-        /* ===== CONTROLS ===== */
-        .nav-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        button {
-            padding: 12px 28px;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            background: var(--bg-light);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-height: 44px;
-            color: var(--text-main);
-        }
-
-        button:hover:not(:disabled) {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
-        }
-
-        button:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        /* ===== SUBMIT CONTROLS ===== */
+        .submit-container {
+            display: none; /* Hidden until finished */
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 60px;
+            padding-top: 30px;
+            border-top: 2px dashed var(--border);
         }
 
         .btn-submit {
@@ -484,211 +438,68 @@
             border: none;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
             font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-submit:hover {
             box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4);
             transform: translateY(-2px);
-            color: white;
-        }
-
-        #submit-row {
-            display: none;
         }
 
         /* ===== RESULTS ===== */
-        #results {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
+        #results { display: none; animation: fadeIn 0.5s ease; }
+        .results-header { text-align: center; padding: 40px; background: var(--bg-light); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 32px; }
+        .results-header h2 { font-size: 28px; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
+        .score-big { font-size: 56px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+        .results-subtitle { font-size: 16px; color: var(--text-sub); line-height: 1.6; }
+        
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 32px 0; }
+        .stat-card { background: var(--bg-light); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .stat-label { font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .results-header {
-            text-align: center;
-            padding: 40px;
-            background: var(--bg-light);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 32px;
-        }
+        .action-buttons { display: flex; justify-content: center; gap: 16px; margin: 40px 0; flex-wrap: wrap; }
+        .action-buttons .btn-submit { padding: 14px 32px; font-size: 15px; }
 
-        .results-header h2 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-main);
-        }
+        .review-section { margin-top: 40px; }
+        .review-section h3 { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
+        .review-card { background: var(--bg-light); border-radius: 12px; padding: 24px; margin-bottom: 16px; border-left: 5px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s ease; }
+        .review-card:hover { box-shadow: var(--shadow-lg); transform: translateX(4px); }
+        .review-card.correct { border-left-color: var(--success); background: linear-gradient(135deg, var(--bg-light) 0%, var(--success-light) 100%); }
+        .review-card.incorrect { border-left-color: var(--error); background: linear-gradient(135deg, var(--bg-light) 0%, var(--error-light) 100%); }
+        .review-qtext { font-weight: 600; font-size: 15px; margin-bottom: 12px; color: var(--text-main); }
+        .review-item { font-size: 14px; margin-bottom: 8px; color: var(--text-main); }
+        .review-item.correct { color: var(--success); font-weight: 600; }
+        .review-item.incorrect { color: var(--error); }
+        
+        .exp-box { background: rgba(255,255,255,0.6); padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px; color: var(--text-sub); border-left: 3px solid var(--primary); line-height: 1.5; }
 
-        .score-big {
-            font-size: 56px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
-
-        .results-subtitle {
-            font-size: 16px;
-            color: var(--text-sub);
-            line-height: 1.6;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin: 32px 0;
-        }
-
-        .stat-card {
-            background: var(--bg-light);
-            padding: 24px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-        }
-
-        .action-buttons .btn-submit {
-            padding: 14px 32px;
-            font-size: 15px;
-        }
-
-        .review-section {
-            margin-top: 40px;
-        }
-
-        .review-section h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .review-card {
-            background: var(--bg-light);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 16px;
-            border-left: 5px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .review-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateX(4px);
-        }
-
-        .review-card.correct {
-            border-left-color: var(--success);
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--success-light) 100%);
-        }
-
-        .review-card.incorrect {
-            border-left-color: var(--error);
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--error-light) 100%);
-        }
-
-        .review-qtext {
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 12px;
-            color: var(--text-main);
-        }
-
-        .review-item {
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .review-item.correct {
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        .review-item.incorrect {
-            color: var(--error);
-        }
-
-        .exp-box {
-            background: rgba(0,0,0,0.03);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--text-sub);
-            border-left: 3px solid var(--primary);
-            line-height: 1.5;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .sidebar { width: 260px; }
             .main-content { margin-left: 260px; padding: 30px; }
-            .header h1 { font-size: 28px; }
-            .qcard { padding: 24px; min-height: 450px; }
         }
 
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
             .sidebar-content { flex-direction: row; gap: 20px; padding: 20px; }
             .main-content { margin-left: 0; padding: 20px; max-width: 100%; }
-            .header h1 { font-size: 24px; }
-            .qcard { padding: 20px; min-height: auto; }
-            .nav-controls { flex-direction: column; gap: 12px; }
-            button { width: 100%; justify-content: center; }
-            .result-grid { grid-template-columns: 1fr; }
+            .progress-container { top: 0; padding-top: 10px; }
             .action-buttons { flex-direction: column; }
             .action-buttons .btn-submit { width: 100%; }
         }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -711,7 +522,7 @@
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <img src="jade_logo.webp" alt="Jade Global Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <div style="display:none; font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">JADE GLOBAL AI</div>
+            <div style="display:none; font-weight: 800; color: var(--primary); font-size: 1.2rem; letter-spacing: -0.5px;">JADE GLOBAL</div>
         </div>
     </div>
     <div class="sidebar-content">
@@ -724,7 +535,7 @@
             <div class="answered-count" id="ans-num">0 / 20</div>
         </div>
         <nav class="sidebar-nav">
-            <a href="index.html">← Exit to Dashboard</a>
+            <a href="../index.html">← Exit to Dashboard</a>
         </nav>
     </div>
 </div>
@@ -732,14 +543,14 @@
 <div class="main-content">
     <div id="quiz-ui">
         <div class="header">
-            <div class="badge">Module 1: LLM Basics</div>
+            <div class="badge">React Advanced</div>
             <h1>Post-Assessment</h1>
-            <p class="subtitle">Demonstrate your learning from the course materials. Answer based on what you've learned.</p>
+            <p class="subtitle">Scroll down to answer all questions. Demonstrate your learning from the course materials.</p>
         </div>
 
         <div class="progress-container">
             <div class="progress-info">
-                <span class="progress-label">Progress</span>
+                <span class="progress-label">Completion Progress</span>
                 <span class="progress-percentage" id="prog-text">0%</span>
             </div>
             <div class="progress-bar">
@@ -749,12 +560,9 @@
 
         <div id="questions-container"></div>
 
-        <div class="nav-controls">
-            <button id="prev-btn" onclick="nav(-1)" disabled>← Previous</button>
-            <div id="submit-row">
-                <button class="btn-submit" onclick="submitAssessment()">Submit Final Quiz →</button>
-            </div>
-            <button id="next-btn" onclick="nav(1)">Next →</button>
+        <div class="submit-container" id="submit-row">
+            <h3 style="margin-bottom: 15px; color: var(--text-main);">You have answered all questions!</h3>
+            <button class="btn-submit" onclick="submitAssessment()">Submit Final Quiz →</button>
         </div>
     </div>
 
@@ -762,13 +570,256 @@
 </div>
 
 <script>
+    const QS = [
+    {
+        topic: "VDOM & Reconciliation",
+        q: "What is the primary advantage of the React Fiber architecture over the older Stack reconciler?",
+        opts: [
+            "It automatically writes CSS transitions",
+            "It can pause, abort, or reuse rendering work as new updates come in",
+            "It removes the Virtual DOM entirely",
+            "It converts React to a server-side only framework"
+        ],
+        ans: 1,
+        exp: "Fiber introduced an interruptible rendering engine, allowing React to prioritize urgent updates (like typing) over less urgent tasks (like data rendering)."
+    },
+    {
+        topic: "VDOM & Reconciliation",
+        q: "During reconciliation, how does React handle two root elements of different types (e.g., an &lt;a&gt; changing into an &lt;img&gt;)?",
+        opts: [
+            "It morphs the DOM node attributes to match the new type",
+            "It throws a reconciliation warning in the console",
+            "It tears down the old tree completely and builds the new tree from scratch",
+            "It uses CSS display properties to hide the old element"
+        ],
+        ans: 2,
+        exp: "React's diffing heuristic states that whenever root elements have different types, React assumes the entire subtree has changed and tears it down completely for performance."
+    },
+    {
+        topic: "Scheduling & Rendering",
+        q: "What is the fundamental difference between React's 'Render' phase and the 'Commit' phase?",
+        opts: [
+            "Render calculates changes and is interruptible; Commit applies changes to the DOM and is synchronous",
+            "Render applies changes to the DOM; Commit fetches the API data",
+            "Both phases are synchronous and cannot be interrupted",
+            "Render is for class components; Commit is used exclusively for hooks"
+        ],
+        ans: 0,
+        exp: "The Render phase creates the 'work-in-progress' tree and can be paused. The Commit phase actually mutates the DOM and cannot be interrupted."
+    },
+    {
+        topic: "Scheduling & Rendering",
+        q: "Which hook executes synchronously immediately after React has performed all DOM mutations, but before the browser has painted?",
+        opts: [
+            "useEffect",
+            "useLayoutEffect",
+            "useTransition",
+            "useSyncExternalStore"
+        ],
+        ans: 1,
+        exp: "useLayoutEffect blocks the browser from painting until its execution finishes, making it necessary for measuring DOM nodes and avoiding layout shifts."
+    },
+    {
+        topic: "Concurrency, SSR & Beyond",
+        q: "What specific problem does the `useTransition` hook solve in React 18?",
+        opts: [
+            "Animating CSS properties between routes",
+            "Routing between pages on a Next.js server",
+            "Keeping the UI responsive by marking heavy state updates as non-urgent",
+            "Converting class components to concurrent hooks"
+        ],
+        ans: 2,
+        exp: "useTransition allows you to mark specific state updates as 'transitions', meaning they can be interrupted by higher-priority updates, keeping the UI from freezing."
+    },
+    {
+        topic: "Concurrency, SSR & Beyond",
+        q: "What is a defining characteristic of React Server Components (RSCs)?",
+        opts: [
+            "They execute strictly on the server and send zero JavaScript code to the client bundle",
+            "They require Redux or Zustand to function correctly",
+            "They are just a new name for traditional Server-Side Rendering (SSR)",
+            "They run in the browser's Service Worker to cache data"
+        ],
+        ans: 0,
+        exp: "Unlike traditional SSR which sends HTML plus the component's JS to hydrate, RSCs send a serialized UI description. Their JavaScript is never downloaded by the client."
+    },
+    {
+        topic: "Concurrency, SSR & Beyond",
+        q: "In SSR architectures like Next.js, what does the term 'Hydration' refer to?",
+        opts: [
+            "Loading CSS files dynamically",
+            "The process of attaching React event listeners to the static HTML sent by the server",
+            "Refreshing the database cache on the server side",
+            "Converting JSON API responses into XML"
+        ],
+        ans: 1,
+        exp: "Hydration is how React 'wakes up' the static, server-rendered HTML in the browser by attaching event handlers and making it a fully interactive SPA."
+    },
+    {
+        topic: "Architecture & State",
+        q: "When building a highly reusable &lt;Dropdown /&gt; component, which pattern allows you to cleanly separate the UI rendering from the state logic?",
+        opts: [
+            "Prop Drilling",
+            "Render Props or Custom Hooks (Inversion of Control)",
+            "Redux Thunks",
+            "Portal Injection"
+        ],
+        ans: 1,
+        exp: "Render props and custom hooks enable Inversion of Control, allowing the parent to determine the UI while the complex logic is abstracted inside the component/hook."
+    },
+    {
+        topic: "Architecture & State",
+        q: "In an enterprise app, why might Zustand, Jotai, or Redux be chosen over the Context API for frequently updating global state?",
+        opts: [
+            "Context API is deprecated in React 18",
+            "Context API triggers a re-render of ALL consumers whenever ANY part of the value changes",
+            "Zustand is built directly into the React core library",
+            "Context API cannot store Javascript objects or arrays"
+        ],
+        ans: 1,
+        exp: "Context lacks fine-grained reactivity. If a massive provider updates, every component using useContext will re-render, creating severe performance bottlenecks."
+    },
+    {
+        topic: "Architecture & State",
+        q: "What is the primary purpose of the `useSyncExternalStore` hook?",
+        opts: [
+            "Safely connecting React to non-React state management systems to prevent 'tearing' in concurrent mode",
+            "Syncing localStorage values across multiple browser tabs",
+            "Fetching asynchronous data from a REST API",
+            "Uploading files to an external AWS S3 bucket safely"
+        ],
+        ans: 0,
+        exp: "useSyncExternalStore is specifically designed to read from external data sources while ensuring the UI remains consistent during concurrent rendering."
+    },
+    {
+        topic: "Data & Performance",
+        q: "How do you properly implement Code Splitting to lazily load a component in React?",
+        opts: [
+            "import { lazy } from 'react'",
+            "const Comp = lazy(() =&gt; import('./Comp')) wrapped inside a &lt;Suspense&gt; boundary",
+            "Using the useLazyLoad() hook",
+            "Putting the component inside the public/ folder"
+        ],
+        ans: 1,
+        exp: "React.lazy combined with a Suspense boundary allows you to dynamically load a component's chunk only when it is needed, heavily reducing the initial JS bundle."
+    },
+    {
+        topic: "Data & Performance",
+        q: "A component wrapped in `React.memo` is still re-rendering every time its parent renders. What is the most likely cause?",
+        opts: [
+            "React.memo is broken in the latest version",
+            "The parent is passing an inline object or un-memoized function as a prop, breaking referential equality",
+            "The component does not have a unique key prop",
+            "React.memo only works on Class components"
+        ],
+        ans: 1,
+        exp: "If a parent passes `style={{ color: 'red' }}` or `onClick={() =&gt; doSomething()}`, a brand new memory reference is created every render, defeating React.memo."
+    },
+    {
+        topic: "Data & Performance",
+        q: "What is a 'Stale Closure' in the context of React Hooks?",
+        opts: [
+            "When an API endpoint times out",
+            "When a component unmounts but a timeout continues running in the background",
+            "When a function inside useEffect captures an old state value because that state was omitted from the dependency array",
+            "When CSS styles fail to load properly"
+        ],
+        ans: 2,
+        exp: "If dependencies are missing, the closure inside useEffect 'traps' the state variables from the exact render cycle in which it was created, leading to bugs."
+    },
+    {
+        topic: "Data & Performance",
+        q: "SWR and React Query implement a caching strategy known as 'stale-while-revalidate'. What does this mean?",
+        opts: [
+            "It deletes stale data instantly to save memory",
+            "It serves cached data immediately, fetches new data in the background, and seamlessly updates the UI",
+            "It pauses the UI with a spinner until the data is revalidated",
+            "It refuses to fetch if data is older than 5 seconds"
+        ],
+        ans: 1,
+        exp: "This strategy provides an instant UI response by showing cached data while simultaneously ensuring the data becomes up-to-date behind the scenes."
+    },
+    {
+        topic: "Production Systems",
+        q: "What is a major architectural limitation of React Error Boundaries?",
+        opts: [
+            "They only work in Development mode",
+            "They can only catch errors in the render phase/lifecycle methods, NOT in async callbacks like fetch or setTimeout",
+            "They slow down the application rendering speed by 50%",
+            "They replace standard try/catch blocks entirely"
+        ],
+        ans: 1,
+        exp: "Error Boundaries cannot catch errors inside event handlers (like onClick) or asynchronous API calls. Standard try/catch blocks are still required for those."
+    },
+    {
+        topic: "Production Systems",
+        q: "Why does React Strict Mode render components twice during development?",
+        opts: [
+            "To test the hardware speed of the developer's computer",
+            "To intentionally expose side effects and impure functions by running the render phase multiple times",
+            "Because Webpack bundles the source code twice",
+            "To pre-fetch data for the initial load"
+        ],
+        ans: 1,
+        exp: "Strict mode intentionally double-invokes render phases and effect setups to help developers spot accidental side-effects and memory leaks before production."
+    },
+    {
+        topic: "Production Systems",
+        q: "In a massive monorepo, what technology allows separate, independently deployed React applications to share dependencies and components at runtime?",
+        opts: [
+            "Docker Containers",
+            "Webpack Module Federation",
+            "Babel AST Plugins",
+            "NPM Link Scripts"
+        ],
+        ans: 1,
+        exp: "Module Federation allows multiple separate builds to form a single application, which is the backbone of modern Micro-Frontend architecture."
+    },
+    {
+        topic: "Deploy & Observe",
+        q: "How do you properly measure the rendering performance of specific subtrees in a React production build?",
+        opts: [
+            "Using standard console.time() statements",
+            "Wrapping components in the &lt;Profiler&gt; API and analyzing the onRender callback metrics",
+            "Checking the browser's Network tab",
+            "Using useLayoutEffect to measure timestamps"
+        ],
+        ans: 1,
+        exp: "The &lt;Profiler&gt; component natively measures how often a React application renders and exactly what the 'cost' of rendering is, helping identify bottlenecks."
+    },
+    {
+        topic: "Deploy & Observe",
+        q: "When deploying a highly secure React application, what is the best practice for handling Source Maps?",
+        opts: [
+            "Upload them to the public server so everyone can view them",
+            "Delete them entirely so no one, including your team, can debug the code",
+            "Generate them during CI/CD, upload them directly to observability tools (like Sentry), and do not serve them publicly",
+            "Include them directly inline inside the main JS bundle"
+        ],
+        ans: 2,
+        exp: "Source maps reverse-engineer your minified code. Secure deployments upload them to error tracking tools but keep them completely off the public web server."
+    },
+    {
+        topic: "Scheduling & Rendering",
+        q: "React strongly emphasizes that the render phase must be 'Pure'. What does this mean?",
+        opts: [
+            "It must only use inline CSS, no external stylesheets",
+            "Given the same inputs, it must return the same JSX without mutating any variables or state that existed before rendering",
+            "It cannot contain any native HTML elements, only Custom Components",
+            "It only accepts strings and numbers as props, never objects"
+        ],
+        ans: 1,
+        exp: "Render functions should act like mathematical pure functions. Modifying external variables during render causes erratic UI bugs and breaks concurrent features."
+    }
+];
+
 // ==========================================
 // 1. STRICT AUTO-REDIRECT GATEKEEPER 
 // Uses DOMContentLoaded to run instantly
 // ==========================================
 document.addEventListener("DOMContentLoaded", function() {
-    const preDone = localStorage.getItem('adv_pre_completed');
-    const contentDone = localStorage.getItem('adv_content_completed'); 
+    const preDone = localStorage.getItem('react_adv_pre_completed');
+    const contentDone = localStorage.getItem('react_adv_content_completed'); 
     
     // Check 1: Did they skip the Pre-Assessment?
     if (!preDone) {
@@ -795,150 +846,7 @@ document.addEventListener("DOMContentLoaded", function() {
     startTimer();
 });
 
-const QS = [
-    {
-        topic:"Transformer Architecture",
-        q:"According to the 2017 paper 'Attention is All You Need', what is the 'engine' powering modern LLMs?",
-        opts:["Recurrent Neural Networks (RNNs)","The Transformer Architecture","Long Short-Term Memory (LSTM)","Convolutional Neural Networks"],
-        ans:1,
-        exp:"The Transformer architecture, introduced in 2017, is the foundation for models like GPT, Claude, and Gemini."
-    },
-    {
-        topic:"Transformer Architecture",
-        q:"Which mechanism allows a Transformer to connect every word in a sentence to every other word regardless of distance?",
-        opts:["Sequential Bottleneck","The Attention Mechanism","Linear Transformation","Data Scraping"],
-        ans:1,
-        exp:"The Attention mechanism looks at ALL other words to determine context, solving the long-term context memory loss of RNNs."
-    },
-    {
-        topic:"Transformer Architecture",
-        q:"In the Attention formula, which component represents 'What information do I provide?'",
-        opts:["Query (Q)","Key (K)","Value (V)","Positional Encoding"],
-        ans:2,
-        exp:"Value (V) represents the actual content or information provided by a token."
-    },
-    {
-        topic:"Transformer Architecture",
-        q:"Which half of the Transformer is responsible for 'Understanding' and building a contextual representation?",
-        opts:["The Decoder","The Encoder","The Output Layer","The Softmax Layer"],
-        ans:1,
-        exp:"The Encoder handles input embedding and positional encoding to 'understand' context."
-    },
-    {
-        topic:"Transformer Architecture",
-        q:"Which model type uses only the 'Decoder' half of the Transformer for generation?",
-        opts:["BERT","RoBERTa","GPT-4","T5"],
-        ans:2,
-        exp:"GPT-4, Claude, and Llama are Decoder-only models focused on generating one token at a time."
-    },
-    {
-        topic:"Transformer Architecture",
-        q:"Why is 'Positional Encoding' added to token embeddings?",
-        opts:["To reduce GPU costs","Because the attention mechanism has no inherent sense of word order","To translate words into French","To clean toxic content"],
-        ans:1,
-        exp:"Without positional encoding, a Transformer would treat 'Dog bites man' and 'Man bites dog' identically because attention has no sense of sequence."
-    },
-    {
-        topic:"Transformer Architecture",
-        q:"What stage uses probabilities over the entire vocabulary to pick the highest probability token?",
-        opts:["Input Tokens","Layer Normalization","Output Layer + Softmax","Multi-Head Self-Attention"],
-        ans:2,
-        exp:"The final Softmax layer converts internal values into probabilities to select the next token."
-    },
-    {
-        topic:"What are LLMs",
-        q:"What is the primary objective of an LLM during the 'Pre-training' phase?",
-        opts:["Translating books","Predicting the next token/word in a sequence","Cleaning Wikipedia data","Developing human emotions"],
-        ans:1,
-        exp:"LLMs learn by predicting the next word trillions of times from massive internet-scale data."
-    },
-    {
-        topic:"What are LLMs",
-        q:"What does 'RLHF' stand for in the LLM training pipeline?",
-        opts:["Rapid Learning High Frequency","Reinforcement Learning from Human Feedback","Remote Language Handling Function","Randomized Linear Hidden Filters"],
-        ans:1,
-        exp:"RLHF uses human feedback to align the model's raw capabilities with human values and safety."
-    },
-    {
-        topic:"What are LLMs",
-        q:"Approximately how many parameters does GPT-4 contain?",
-        opts:["175 Billion","500 Million","1.8 Trillion","10 Trillion"],
-        ans:2,
-        exp:"GPT-4 is a massive model with approximately 1.8 trillion parameters."
-    },
-    {
-        topic:"LLM Applications",
-        q:"Which healthcare software provider uses LLMs specifically for clinical note drafting?",
-        opts:["Khan Academy","Epic","Harvey AI","Shopify"],
-        ans:1,
-        exp:"Epic uses LLMs to help healthcare providers generate clinical notes and summarize patient records."
-    },
-    {
-        topic:"LLM Applications",
-        q:"Which model was specifically trained on financial data?",
-        opts:["Claude 3","Gemini 1.5","Bloomberg GPT","Mistral"],
-        ans:2,
-        exp:"Bloomberg GPT is an example of an industry-specific model trained on financial reporting data."
-    },
-    {
-        topic:"LLM Applications",
-        q:"Which application uses LLMs for automated code autocomplete and test generation?",
-        opts:["Netflix","GitHub Copilot","Spotify","Waymo"],
-        ans:1,
-        exp:"Software development is being changed by tools like GitHub Copilot, Cursor, and Tabnine."
-    },
-    {
-        topic:"LLM Applications",
-        q:"What is a capability of Multimodal AI models like Gemini 1.5 Pro?",
-        opts:["Summarizing video content and describing actions","Translating only two languages","Fixing hardware bugs","Running without GPUs"],
-        ans:0,
-        exp:"Multimodal models can reason about video content, images, and audio in addition to text."
-    },
-    {
-        topic:"Prompt Basics",
-        q:"Which prompting strategy involves giving 2-5 examples before the actual task?",
-        opts:["Zero-Shot Prompting","Few-Shot Prompting","Topic Labeling","Role Prompting"],
-        ans:1,
-        exp:"Few-shot prompting is best for nuanced or pattern-based tasks where examples guide the model."
-    },
-    {
-        topic:"Prompt Basics",
-        q:"What is a major risk when using LLMs for legal research or document drafting?",
-        opts:["The model is too slow","Hallucinations (stating false facts confidently)","The model cannot read PDFs","The model only knows 1950s law"],
-        ans:1,
-        exp:"LLMs cannot always guarantee factual accuracy and can hallucinate fake court cases or facts."
-    },
-    {
-        topic:"Prompt Basics",
-        q:"Which best practice helps an LLM act as a 'Smart Intern'?",
-        opts:["Providing no context","Being vague","Giving a specific role and clear context","Asking for 50 tasks at once"],
-        ans:2,
-        exp:"To get better results, you should provide context, assign a role (e.g., Senior Developer), and be specific."
-    },
-    {
-        topic:"NLP Fundamentals",
-        q:"Which type of tokenization does GPT use to handle unknown words by breaking them into frequent fragments?",
-        opts:["Word Tokenization","Character Tokenization","Subword (BPE) Tokenization","Sentence Parsing"],
-        ans:2,
-        exp:"LLMs use Byte Pair Encoding (BPE) or subword tokenization to handle morphology and rare words."
-    },
-    {
-        topic:"NLP Fundamentals",
-        q:"What does the analogy 'King - Man + Woman = Queen' demonstrate about word embeddings?",
-        opts:["The model was manually programmed with royal facts","Embeddings capture semantic relationships and reasoning from text patterns","Embeddings only work for gender-based words","The model is conscious of royal hierarchies"],
-        ans:1,
-        exp:"Embeddings represent words as vectors where similar meanings occupy similar positions in multidimensional space."
-    },
-    {
-        topic:"Introduction to AI",
-        q:"What is the relationship between AI, Machine Learning (ML), and Deep Learning (DL)?",
-        opts:["They are the same thing","ML is a subset of AI; DL is a subset of ML","AI is a subset of DL","They are unrelated categories"],
-        ans:1,
-        exp:"AI is the broadest field; ML is a subset of AI, and DL (using multi-layered neural nets) is a subset of ML."
-    }
-];
 
-let current = 0;
 let answered = {};
 let submitted = false;
 let timeLeft = 20 * 60;
@@ -948,7 +856,8 @@ function buildQuestions() {
     const c = document.getElementById('questions-container');
     QS.forEach((q, i) => {
         const d = document.createElement('div');
-        d.className = 'qcard' + (i === 0 ? ' active' : '');
+        // ALL cards get the standard qcard class without relying on 'active' toggles
+        d.className = 'qcard';
         d.id = 'q' + i;
         d.innerHTML = `
             <div class="qcard-header">
@@ -973,8 +882,11 @@ function buildQuestions() {
 function selectOpt(qi, oi) {
     if (submitted) return;
     answered[qi] = oi;
+    
+    // Toggle selected class
     document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
     
+    // Update Stats
     const answeredCount = Object.keys(answered).length;
     document.getElementById('ans-num').textContent = `${answeredCount} / ${QS.length}`;
     
@@ -982,18 +894,10 @@ function selectOpt(qi, oi) {
     document.getElementById('prog').style.width = progPct + '%';
     document.getElementById('prog-text').textContent = progPct + '%';
     
-    // Show submit button when all questions are answered
+    // Show submit button ONLY when all questions are answered
     if (answeredCount === QS.length) {
         document.getElementById('submit-row').style.display = 'block';
     }
-}
-
-function nav(dir) {
-    document.getElementById('q' + current).classList.remove('active');
-    current = Math.max(0, Math.min(QS.length - 1, current + dir));
-    document.getElementById('q' + current).classList.add('active');
-    document.getElementById('prev-btn').disabled = (current === 0);
-    document.getElementById('next-btn').disabled = (current === QS.length - 1);
 }
 
 function submitAssessment() {
@@ -1001,8 +905,11 @@ function submitAssessment() {
     submitted = true; 
     clearInterval(timerInt);
     
-    // Update local storage key matching the original prompt
-    localStorage.setItem('basics_post_completed', 'true');
+    // Update local storage key matching the Advanced Module
+    localStorage.setItem('react_adv_post_completed', 'true');
+    
+    // Scroll to the top to cleanly show results
+    window.scrollTo(0, 0);
     showResults();
 }
 
@@ -1023,7 +930,7 @@ function showResults() {
         <div class="results-header">
             <h2>🎉 Post-Assessment Complete</h2>
             <div class="score-big">${pct}%</div>
-            <p class="results-subtitle">Great work! The Practical Assignment is now unlocked.</p>
+            <p class="results-subtitle">Great work! The Advanced Practical Assignment is now unlocked.</p>
         </div>
 
         <div class="result-grid">
@@ -1043,7 +950,7 @@ function showResults() {
 
         <div class="action-buttons">
             <button class="btn-submit" onclick="window.location.href='index.html'" style="background: var(--bg-light); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;">← Return to Dashboard</button>
-            <button class="btn-submit" onclick="window.location.href='assignment.html'">💻 Go to Assignment →</button>
+            <button class="btn-submit" onclick="window.location.href='adv_assignment.html'">💻 Go to Assignment →</button>
         </div>
 
         <div class="review-section">

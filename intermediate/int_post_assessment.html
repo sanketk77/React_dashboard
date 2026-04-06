@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="scormdriver.js"></script>
-    <script src="APIWrapper.js"></script>
+   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>React Intermediate — Post-Assessment</title>
@@ -34,6 +33,7 @@
 
         html, body {
             height: 100%;
+            scroll-behavior: smooth;
         }
 
         body { 
@@ -118,14 +118,8 @@
             transition: color 0.3s ease;
         }
 
-        .timer-value.warning {
-            color: #f57c00;
-        }
-
-        .timer-value.critical {
-            color: var(--error);
-            animation: pulse 1s infinite;
-        }
+        .timer-value.warning { color: #f57c00; }
+        .timer-value.critical { color: var(--error); animation: pulse 1s infinite; }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -220,8 +214,16 @@
         }
 
         /* ===== PROGRESS BAR ===== */
+        /* Updated to stick to the top when scrolling */
         .progress-container {
             margin-bottom: 40px;
+            position: sticky;
+            top: 0;
+            background: rgba(248, 249, 250, 0.95);
+            padding: 10px 0 20px 0;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
         }
 
         .progress-info {
@@ -262,10 +264,7 @@
         .progress-fill::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2s infinite;
         }
@@ -275,22 +274,17 @@
             100% { transform: translateX(100%); }
         }
 
-        /* ===== QUESTION CARD ===== */
+        /* ===== QUESTION CARDS (Scrolling Layout) ===== */
         .qcard {
             background: var(--bg-light);
             border-radius: 16px;
             padding: 32px;
             box-shadow: var(--shadow);
-            display: none;
             border: 1px solid var(--border);
-            min-height: 500px;
-            flex-direction: column;
-            justify-content: space-between;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .qcard.active {
             display: flex;
+            flex-direction: column;
+            margin-bottom: 40px; /* Spacing between cards */
+            animation: fadeIn 0.4s ease;
         }
 
         .qcard-header {
@@ -323,28 +317,12 @@
             letter-spacing: -0.3px;
         }
 
-        .code-block {
-            background: var(--code-bg);
-            color: #dcdcdc;
-            padding: 1.2rem;
-            border-radius: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            margin-top: 16px;
-            overflow-x: auto;
-            border-left: 4px solid var(--primary);
-        }
-
-        .qcard-content {
-            flex: 1;
-        }
-
         /* ===== OPTIONS ===== */
         .options {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 28px;
+            margin-top: 20px;
         }
 
         .opt {
@@ -364,10 +342,7 @@
         .opt::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
+            top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             transition: left 0.4s ease;
         }
@@ -379,9 +354,7 @@
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
         }
 
-        .opt:hover::before {
-            left: 100%;
-        }
+        .opt:hover::before { left: 100%; }
 
         .opt.selected {
             background: var(--primary-light);
@@ -390,18 +363,9 @@
         }
 
         .olabel {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-main);
-            background: var(--bg);
-            flex-shrink: 0;
+            width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            font-weight: 700; color: var(--text-main); background: var(--bg); flex-shrink: 0;
             transition: all 0.3s ease;
         }
 
@@ -412,55 +376,16 @@
             box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
         }
 
-        .otext {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text-main);
-            line-height: 1.4;
-        }
+        .otext { font-size: 15px; font-weight: 500; color: var(--text-main); line-height: 1.4; }
 
-        /* ===== CONTROLS ===== */
-        .nav-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-
-        button {
-            padding: 12px 28px;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            background: var(--bg-light);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-height: 44px;
-            color: var(--text-main);
-        }
-
-        button:hover:not(:disabled) {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: var(--primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
-        }
-
-        button:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        /* ===== SUBMIT CONTROLS ===== */
+        .submit-container {
+            display: none; /* Hidden until finished */
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 60px;
+            padding-top: 30px;
+            border-top: 2px dashed var(--border);
         }
 
         .btn-submit {
@@ -469,211 +394,66 @@
             border: none;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
             font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-submit:hover {
             box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4);
             transform: translateY(-2px);
-            color: white;
-        }
-
-        #submit-row {
-            display: none;
         }
 
         /* ===== RESULTS ===== */
-        #results {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
+        #results { display: none; animation: fadeIn 0.5s ease; }
+        .results-header { text-align: center; padding: 40px; background: var(--bg-light); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 32px; }
+        .results-header h2 { font-size: 28px; font-weight: 700; margin-bottom: 20px; color: var(--text-main); }
+        .score-big { font-size: 56px; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+        .results-subtitle { font-size: 16px; color: var(--text-sub); line-height: 1.6; }
+        
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin: 32px 0; }
+        .stat-card { background: var(--bg-light); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .stat-label { font-size: 12px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .results-header {
-            text-align: center;
-            padding: 40px;
-            background: var(--bg-light);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 32px;
-        }
+        .action-buttons { display: flex; justify-content: center; gap: 16px; margin: 40px 0; flex-wrap: wrap; }
+        .action-buttons .btn-submit { padding: 14px 32px; font-size: 15px; }
 
-        .results-header h2 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-main);
-        }
+        .review-section { margin-top: 40px; }
+        .review-section h3 { font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
+        .review-card { background: var(--bg-light); border-radius: 12px; padding: 24px; margin-bottom: 16px; border-left: 5px solid var(--border); box-shadow: var(--shadow); }
+        .review-card.correct { border-left-color: var(--success); background: linear-gradient(135deg, var(--bg-light) 0%, var(--success-light) 100%); }
+        .review-card.incorrect { border-left-color: var(--error); background: linear-gradient(135deg, var(--bg-light) 0%, var(--error-light) 100%); }
+        .review-qtext { font-weight: 600; font-size: 15px; margin-bottom: 12px; color: var(--text-main); }
+        .review-item { font-size: 14px; margin-bottom: 8px; color: var(--text-main); }
+        .review-item.correct { color: var(--success); font-weight: 600; }
+        .review-item.incorrect { color: var(--error); }
+        
+        .exp-box { background: rgba(255,255,255,0.6); padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 13px; color: var(--text-sub); border-left: 3px solid var(--primary); line-height: 1.5; }
 
-        .score-big {
-            font-size: 56px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
-
-        .results-subtitle {
-            font-size: 16px;
-            color: var(--text-sub);
-            line-height: 1.6;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin: 32px 0;
-        }
-
-        .stat-card {
-            background: var(--bg-light);
-            padding: 24px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-        }
-
-        .action-buttons .btn-submit {
-            padding: 14px 32px;
-            font-size: 15px;
-        }
-
-        .review-section {
-            margin-top: 40px;
-        }
-
-        .review-section h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .review-card {
-            background: var(--bg-light);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 16px;
-            border-left: 5px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .review-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateX(4px);
-        }
-
-        .review-card.correct {
-            border-left-color: var(--success);
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--success-light) 100%);
-        }
-
-        .review-card.incorrect {
-            border-left-color: var(--error);
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--error-light) 100%);
-        }
-
-        .review-qtext {
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 12px;
-            color: var(--text-main);
-        }
-
-        .review-item {
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .review-item.correct {
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        .review-item.incorrect {
-            color: var(--error);
-        }
-
-        .exp-box {
-            background: rgba(255,255,255,0.6);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--text-sub);
-            border-left: 3px solid var(--primary);
-            line-height: 1.5;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .sidebar { width: 260px; }
             .main-content { margin-left: 260px; padding: 30px; }
-            .header h1 { font-size: 28px; }
-            .qcard { padding: 24px; min-height: 450px; }
         }
 
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
             .sidebar-content { flex-direction: row; gap: 20px; }
             .main-content { margin-left: 0; padding: 20px; max-width: 100%; }
-            .header h1 { font-size: 24px; }
-            .qcard { padding: 20px; min-height: auto; }
-            .nav-controls { flex-direction: column; gap: 12px; }
-            button { width: 100%; justify-content: center; }
-            .result-grid { grid-template-columns: 1fr; }
+            .progress-container { top: 0; padding-top: 10px; }
             .action-buttons { flex-direction: column; }
             .action-buttons .btn-submit { width: 100%; }
         }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -701,8 +481,8 @@
             <div class="answered-count" id="ans-num">0 / 20</div>
         </div>
 
-        <nav class="sidebar-nav">
-            <a href="index.html">← Exit Assessment</a>
+        <nav class="sidebar-nav" style="margin-top: auto;">
+            <a href="../index.html">← Exit Assessment</a>
         </nav>
     </div>
 </div>
@@ -710,14 +490,14 @@
 <div class="main-content">
     <div id="quiz-ui">
         <div class="header">
-            <div class="badge">Module 2: Advanced State</div>
-            <h1>Intermediate Post-Assessment</h1>
-            <p>Validate your mastery of Context, Custom Hooks, and Performance Optimization.</p>
+            <div class="badge">📝 Module 1: Fundamentals</div>
+            <h1>React Intermediate Post-Assessment</h1>
+            <p>Scroll down to answer all questions. Validate your mastery of React concepts and best practices.</p>
         </div>
 
         <div class="progress-container">
             <div class="progress-info">
-                <span class="progress-label">Progress</span>
+                <span class="progress-label">Completion Progress</span>
                 <span class="progress-percentage" id="prog-text">0%</span>
             </div>
             <div class="progress-bar">
@@ -727,12 +507,9 @@
 
         <div id="questions-container"></div>
 
-        <div class="nav-controls">
-            <button id="prev-btn" onclick="nav(-1)" disabled>← Previous</button>
-            <div id="submit-row">
-                <button class="btn-submit" onclick="submitAssessment()">Check My Results →</button>
-            </div>
-            <button id="next-btn" onclick="nav(1)">Next →</button>
+        <div class="submit-container" id="submit-row">
+            <h3 style="margin-bottom: 15px; color: var(--text-main);">You have answered all questions!</h3>
+            <button class="btn-submit" onclick="submitAssessment()">Submit for Grading →</button>
         </div>
     </div>
 
@@ -742,167 +519,270 @@
 <script>
 const QS = [
     {
-        topic: "State Management",
-        q: "You have a theme color used in 15 different components. What is the most effective way to manage this without Prop Drilling?",
-        opts: ["Passing the color as a prop to every child", "Using the Context API (createContext/useContext)", "Storing it in a global CSS file only", "Hardcoding it in each component"],
+        topic: "React Hooks",
+        q: "Why might `console.log(state)` immediately after calling `setState(newValue)` print the old value instead of the new one?",
+        opts: [
+            "setState is broken in functional components",
+            "State updates are asynchronous and batched for performance",
+            "React creates a new component instance immediately",
+            "The state variable is immutable and cannot be logged"
+        ],
         ans: 1,
-        exp: "The Context API allows you to share data globally across the component tree without manually passing props through every level."
+        exp: "State updates in React are asynchronous. The new state value is only available in the next render cycle."
     },
     {
-        topic: "Custom Hooks",
-        q: "Analyze this code. What is the primary advantage of this implementation?",
-        code: "const [val, toggle] = useToggle(false);",
-        opts: ["It is a standard built-in hook", "It encapsulates reusable stateful logic for boolean toggles", "It handles DOM elements directly", "It is used only for CSS classes"],
-        ans: 1,
-        exp: "Custom Hooks allow you to extract and reuse stateful logic between components, improving code readability and maintainability."
-    },
-    {
-        topic: "Optimization",
-        q: "Which hook should you use to optimize an expensive calculation so it doesn't run on every re-render?",
-        opts: ["useCallback", "useMemo", "useRef", "useReducer"],
-        ans: 1,
-        exp: "useMemo caches the result of a calculation and only re-computes it when dependencies change, preventing performance bottlenecks."
-    },
-    {
-        topic: "Advanced State",
-        q: "In a complex form with 10+ fields, why might you choose useReducer over multiple useState calls?",
-        opts: ["To make the code run faster", "To centralize complex state transitions in one function", "Because useState cannot handle objects", "To automatically save data to local storage"],
-        ans: 1,
-        exp: "useReducer is ideal for complex state logic where the next state depends on the previous state or multiple sub-values."
-    },
-    {
-        topic: "DOM Interaction",
-        q: "You need to access a DOM element directly to focus a text input. Which hook is appropriate?",
-        opts: ["useState", "useEffect", "useRef", "useContext"],
+        topic: "React Hooks",
+        q: "What happens if you completely omit the dependency array in a `useEffect` hook?",
+        opts: [
+            "The effect runs only once on mount",
+            "The effect never runs",
+            "The effect runs after every single render",
+            "React throws a compilation error"
+        ],
         ans: 2,
-        exp: "useRef returns a mutable ref object whose .current property can hold a direct reference to a DOM node."
+        exp: "Omitting the dependency array causes the effect to fire after every render, which can lead to infinite loops if state is updated inside it."
     },
     {
-        topic: "Server State",
-        q: "What is the primary benefit of using a library like React Query for data fetching?",
-        opts: ["It removes the need for component styles", "It handles caching, synchronization, and automated background updates", "It is required for the fetch() API to work", "It reduces the final bundle size"],
+        topic: "React Hooks",
+        q: "How do you perform cleanup (like removing event listeners) in a `useEffect` hook?",
+        opts: [
+            "Call a cleanup() function inside the effect",
+            "Return a function from the effect",
+            "Pass a second function as the third argument to useEffect",
+            "Use the useCleanup() hook"
+        ],
         ans: 1,
-        exp: "React Query provides specialized tools for managing server state, including automatic caching and background synchronization."
+        exp: "Returning a function from a useEffect tells React to run that function before the component unmounts or before the effect re-runs."
     },
     {
-        topic: "Architecture",
-        q: "What is 'Memoization' in React?",
-        opts: ["A way to clear component cache", "Caching results to skip unnecessary work or re-renders", "A type of database indexing", "A method for writing JSX templates"],
+        topic: "Props & State",
+        q: "What does the concept of 'Lifting State Up' mean in React?",
+        opts: [
+            "Moving state to a global Redux store",
+            "Moving state to the closest common ancestor of components that need it",
+            "Using a Custom Hook to manage state",
+            "Converting props into state variables"
+        ],
         ans: 1,
-        exp: "Memoization is a performance technique that stores the results of expensive operations to avoid repetitive work."
+        exp: "When multiple components need to share the same changing data, it is recommended to lift the shared state up to their closest common ancestor parent."
     },
     {
-        topic: "Frameworks",
-        q: "Which framework is commonly used for Server-Side Rendering (SSR) to improve SEO?",
-        opts: ["Vite", "Next.js", "Redux", "Zustand"],
+        topic: "Props & State",
+        q: "Why should you never mutate state directly (e.g., `state.count = 1`)?",
+        opts: [
+            "It will cause an infinite loop",
+            "React relies on object identity comparison and won't trigger a re-render",
+            "It deletes the Virtual DOM",
+            "It throws a strict mode JavaScript syntax error"
+        ],
         ans: 1,
-        exp: "Next.js is the leading React framework for building full-stack applications with support for SSR and static site generation."
+        exp: "React detects changes by comparing object references. Mutating state directly bypasses this, meaning the UI won't update to reflect the change."
     },
     {
-        topic: "Event Handling",
-        q: "When passing a function as a prop to a memoized child component, which hook ensures the function reference remains the same between renders?",
-        opts: ["useMemo", "useCallback", "useRef", "useEffect"],
-        ans: 1,
-        exp: "useCallback memoizes the function itself, preventing child components from re-rendering unnecessarily when the parent's state changes."
-    },
-    {
-        topic: "Component Patterns",
-        q: "What is 'Prop Drilling' specifically?",
-        opts: ["A way to inject CSS into HTML", "The process of passing props through multiple nested components that do not need them", "A method for drilling into a database", "A technique for performance testing"],
-        ans: 1,
-        exp: "Prop drilling makes code harder to maintain; it is often solved by using Context API or global state management."
-    },
-    {
-        topic: "Advanced Hooks",
-        q: "What is the correct way to trigger a specific state change in a useReducer pattern?",
-        opts: ["state.value = newValue", "updateReducer(newValue)", "dispatch({ type: 'ACTION_NAME', payload: data })", "setState(reducer(data))"],
+        topic: "Props & State",
+        q: "How can a child component communicate data back up to its parent?",
+        opts: [
+            "By using the useParent() hook",
+            "By directly modifying the parent's state object",
+            "By calling a callback function passed down as a prop from the parent",
+            "By using the &lt;Emit /&gt; component"
+        ],
         ans: 2,
-        exp: "Dispatching actions is the only way to trigger a state update in useReducer, keeping state transitions predictable."
+        exp: "Data flows down via props, but parents can pass functions to children. The child calls this function to send data or events back up."
     },
     {
-        topic: "Lifecycle Management",
-        q: "Which hook should be used for operations that must happen synchronously after all DOM mutations, such as measuring layout?",
-        opts: ["useEffect", "useLayoutEffect", "useCallback", "useSyncState"],
-        ans: 1,
-        exp: "useLayoutEffect runs synchronously after DOM updates but before the browser paints, making it perfect for UI measurements."
-    },
-    {
-        topic: "Performance",
-        q: "React.memo() is used to wrap a component. When will this component re-render?",
-        opts: ["Whenever the parent re-renders", "Only when its props change", "Every 5 seconds automatically", "Only when the browser is refreshed"],
-        ans: 1,
-        exp: "React.memo is a higher-order component that skips rendering a component if its props have not changed."
-    },
-    {
-        topic: "Global State",
-        q: "In a Redux Toolkit slice, what logic determines how the state changes in response to an action?",
-        opts: ["The Provider", "The Selector", "The Reducer", "The Middleware"],
+        topic: "React Router",
+        q: "Which hook is used in React Router v6 to programmatically navigate a user (e.g., after a form submission)?",
+        opts: [
+            "useHistory()",
+            "useRoute()",
+            "useNavigate()",
+            "useRedirect()"
+        ],
         ans: 2,
-        exp: "Reducers are pure functions that take the current state and an action to return a new state."
+        exp: "In React Router v6, useNavigate() replaced the older useHistory() hook for programmatic navigation."
     },
     {
-        topic: "Testing",
-        q: "Which library is recommended for testing React components by simulating real user interactions?",
-        opts: ["Jest", "React Testing Library", "Redux DevTools", "ESLint"],
-        ans: 1,
-        exp: "React Testing Library encourages testing components as a user would, ensuring better accessibility and reliability."
+        topic: "React Router",
+        q: "How do you extract dynamic URL parameters (like extracting '123' from `/users/123`) using React Router?",
+        opts: [
+            "useParams()",
+            "useRouteMatch()",
+            "useSearch()",
+            "useLocation()"
+        ],
+        ans: 0,
+        exp: "The useParams() hook returns an object of key/value pairs of the dynamic params parsed from the current URL."
     },
     {
-        topic: "Custom Logic",
-        q: "Why should a custom hook's name always start with the word 'use'?",
-        opts: ["To make it easier to find in a search", "To allow React to check for violations of the Rules of Hooks", "Because the browser requires it", "To differentiate it from a CSS module"],
-        ans: 1,
-        exp: "The 'use' prefix is a convention that allows linting tools to ensure hooks are called correctly within components."
-    },
-    {
-        topic: "Fragments",
-        q: "What is the primary benefit of using a React Fragment (<>...</>) over a <div>?",
-        opts: ["It adds extra styling options", "It allows you to group multiple elements without adding an extra node to the DOM", "It makes the code execute faster", "It is required for every component"],
-        ans: 1,
-        exp: "Fragments prevent 'div soup' and keep the DOM tree lean by grouping children without an unnecessary wrapper."
-    },
-    {
-        topic: "Controlled Components",
-        q: "In an intermediate-level React application, where should the 'Single Source of Truth' for form data reside?",
-        opts: ["In the browser's URL", "In the local DOM elements", "In the React state (useState or useReducer)", "In the global CSS file"],
+        topic: "React Router",
+        q: "What is the purpose of the `&lt;Outlet /&gt;` component in React Router v6?",
+        opts: [
+            "To render an external website inside an iframe",
+            "To define the fallback 404 Not Found page",
+            "To render child route elements within a parent layout component",
+            "To pass global state to multiple routes"
+        ],
         ans: 2,
-        exp: "Controlled components ensure that form data is managed by React state, making it easy to validate and manipulate."
+        exp: "An &lt;Outlet /&gt; should be used in parent route elements to render their child route elements, allowing for nested UI layouts."
+    },
+    {
+        topic: "API Integration",
+        q: "What is the standard hook used to trigger an API fetch when a functional component first mounts?",
+        opts: [
+            "useFetch",
+            "useMount",
+            "useState",
+            "useEffect"
+        ],
+        ans: 3,
+        exp: "useEffect with an empty dependency array [] is the standard place to trigger initial data fetching when a component mounts."
+    },
+    {
+        topic: "API Integration",
+        q: "When fetching data, why is it important to implement an AbortController or a cleanup boolean?",
+        opts: [
+            "To prevent memory leaks if the component unmounts before the fetch finishes",
+            "To clear the browser's cache",
+            "To make the API call execute faster",
+            "To bypass CORS errors from the server"
+        ],
+        ans: 0,
+        exp: "If a user navigates away before a fetch completes, attempting to update state on the now-unmounted component causes memory leaks."
+    },
+    {
+        topic: "API Integration",
+        q: "What primary problem do modern libraries like React Query or SWR solve?",
+        opts: [
+            "Routing between pages",
+            "Managing complex CSS styles",
+            "Handling server state, automated caching, and data synchronization",
+            "Compiling JSX into standard JavaScript"
+        ],
+        ans: 2,
+        exp: "These libraries specialize in 'server state' by caching responses, deduplicating requests, and keeping data fresh in the background."
+    },
+    {
+        topic: "Performance Optimization",
+        q: "What is the primary purpose of the `useMemo` hook?",
+        opts: [
+            "To memoize a function definition so it isn't recreated",
+            "To cache the result of an expensive calculation between renders",
+            "To remember the previous state value of an input",
+            "To store data persistently in LocalStorage"
+        ],
+        ans: 1,
+        exp: "useMemo caches the computed value of a function, only recomputing it when its dependencies change, saving processing power."
+    },
+    {
+        topic: "Performance Optimization",
+        q: "How does `useCallback` differ from `useMemo`?",
+        opts: [
+            "useCallback returns a memoized function instance, while useMemo returns a memoized value",
+            "useCallback is for APIs, useMemo is for mathematics",
+            "There is no difference, they are aliases",
+            "useCallback triggers re-renders, useMemo prevents them"
+        ],
+        ans: 0,
+        exp: "useCallback(fn, deps) caches the function instance itself, while useMemo(() => fn(), deps) caches the result of the function."
+    },
+    {
+        topic: "Performance Optimization",
+        q: "When is the most appropriate time to wrap a component in `React.memo`?",
+        opts: [
+            "Always, for every single component in the app",
+            "When a component renders often with the exact same props",
+            "When a component needs to access the Context API",
+            "When a component contains heavy CSS animations"
+        ],
+        ans: 1,
+        exp: "React.memo skips rendering if the props haven't changed. Overusing it on simple components can hurt performance due to the cost of prop comparison."
+    },
+    {
+        topic: "Performance Optimization",
+        q: "Why is using an array `index` as a `key` prop in a mapped list discouraged?",
+        opts: [
+            "It causes strict mode syntax errors",
+            "It makes the code harder for other developers to read",
+            "It can cause rendering bugs and performance issues if the list order changes",
+            "React ignores index keys entirely and generates its own"
+        ],
+        ans: 2,
+        exp: "If items are added, removed, or reordered, using the index as a key confuses React's reconciliation process, leading to incorrect DOM updates."
     },
     {
         topic: "Context API",
-        q: "What happens to components consuming a Context when the Context Provider's value changes?",
-        opts: ["They are deleted", "They automatically re-render with the new value", "Nothing happens until a manual refresh", "They only update if they use props"],
+        q: "Which two parts are fundamentally required to implement the Context API?",
+        opts: [
+            "Router and Switch",
+            "Provider and Consumer (or useContext)",
+            "State and Props",
+            "Sender and Receiver"
+        ],
         ans: 1,
-        exp: "Components using useContext are automatically kept in sync with the latest value provided by the nearest Context Provider."
+        exp: "You need a Provider component to supply the context value to the tree, and a Consumer (typically the useContext hook) to read it."
     },
     {
-        topic: "Architecture",
-        q: "What is the role of 'Selectors' in state management (like Redux or Zustand)?",
-        opts: ["To update the database", "To efficiently extract and compute derived data from the global state", "To choose which CSS file to load", "To select the next component to render"],
+        topic: "Context API",
+        q: "What is a common performance pitfall of using the Context API for everything?",
+        opts: [
+            "It slows down the initial page load time",
+            "It triggers a re-render of all consuming components whenever the context value changes",
+            "It uses too much of the browser's memory",
+            "It automatically blocks asynchronous API calls"
+        ],
         ans: 1,
-        exp: "Selectors provide a way to access specific pieces of state, often including memoization to prevent unnecessary re-calculations."
+        exp: "Every component using useContext() will re-render when the Provider's value changes, even if they only need a small, unrelated piece of that data."
+    },
+    {
+        topic: "Component Architecture",
+        q: "What is a strict rule when creating Custom Hooks in React?",
+        opts: [
+            "They must be written in TypeScript",
+            "Their function names must start with 'use' (e.g., useFetch)",
+            "They cannot call built-in hooks like useState inside them",
+            "They must always return an array"
+        ],
+        ans: 1,
+        exp: "Custom hooks must start with 'use' so React's linter can identify them and automatically enforce the Rules of Hooks."
+    },
+    {
+        topic: "Component Architecture",
+        q: "What is a Higher-Order Component (HOC) in React?",
+        opts: [
+            "A component that sits at the very top of the DOM tree",
+            "A function that takes a component and returns a new, enhanced component",
+            "A component that handles global state exclusively",
+            "A hook that fetches data from an API"
+        ],
+        ans: 1,
+        exp: "An HOC is an advanced pattern for reusing component logic. It is a function that wraps a component to inject additional props or logic (e.g., withRouter)."
     }
 ];
+   
 
-let current = 0;
 let answered = {};
 let submitted = false;
 let timeLeft = 20 * 60;
 let timerInt;
 
 window.onload = function() {
+    // This checks for the Pre-Assessment (Assuming you have this page built)
     const preDone = localStorage.getItem('react_int_pre_completed');
+    
+    // This checks for the Content Page we just linked
     const contentDone = localStorage.getItem('react_int_content_completed'); 
     
-    // Gatekeeper Checks
     if (!preDone) {
         alert("🔒 Access Denied: You must complete the Intermediate Pre-Assessment first.");
         window.location.href = "int_pre_assessment.html";
         return;
     }
+    
+    // If they haven't completed the content, send them back to int_content.html
     if (!contentDone) {
         alert("🔒 Access Denied: Please review the Intermediate Learning Materials before taking this Final Assessment.");
-        window.location.href = "int_content.html";
+        window.location.href ="content.html"; 
         return;
     }
     
@@ -914,14 +794,14 @@ function buildQuestions() {
     const c = document.getElementById('questions-container');
     QS.forEach((q, i) => {
         const d = document.createElement('div');
-        d.className = 'qcard' + (i === 0 ? ' active' : '');
+        // Notice we do not use 'active' class here. All cards are visible.
+        d.className = 'qcard'; 
         d.id = 'q' + i;
         d.innerHTML = `
             <div class="qcard-header">
                 <div class="topic-label">📌 ${q.topic}</div>
                 <div class="qnum">Question ${i+1} of ${QS.length}</div>
                 <div class="qtext">${q.q}</div>
-                ${q.code ? `<div class="code-block">${q.code}</div>` : ''}
             </div>
             <div class="qcard-content">
                 <div class="options" id="opts${i}">
@@ -939,8 +819,11 @@ function buildQuestions() {
 function selectOpt(qi, oi) {
     if (submitted) return;
     answered[qi] = oi;
+    
+    // Toggle selected class
     document.querySelectorAll(`#opts${qi} .opt`).forEach((el, j) => el.classList.toggle('selected', j === oi));
     
+    // Update Stats
     const answeredCount = Object.keys(answered).length;
     document.getElementById('ans-num').textContent = `${answeredCount} / ${QS.length}`;
     
@@ -948,25 +831,22 @@ function selectOpt(qi, oi) {
     document.getElementById('prog').style.width = progPct + '%';
     document.getElementById('prog-text').textContent = progPct + '%';
     
-    // Show submit button when all questions are answered
+    // Show submit button ONLY when all questions are answered
     if (answeredCount === QS.length) {
         document.getElementById('submit-row').style.display = 'block';
     }
-}
-
-function nav(dir) {
-    document.getElementById('q' + current).classList.remove('active');
-    current = Math.max(0, Math.min(QS.length - 1, current + dir));
-    document.getElementById('q' + current).classList.add('active');
-    document.getElementById('prev-btn').disabled = (current === 0);
-    document.getElementById('next-btn').disabled = (current === QS.length - 1);
 }
 
 function submitAssessment() {
     if(submitted) return;
     submitted = true;
     clearInterval(timerInt);
+    
+    // Log completion
     localStorage.setItem('react_int_post_completed', 'true');
+    
+    // Scroll to top to see results
+    window.scrollTo(0, 0);
     showResults();
 }
 
@@ -987,7 +867,7 @@ function showResults() {
         <div class="results-header">
             <h2>🎉 Post-Assessment Complete</h2>
             <div class="score-big">${pct}%</div>
-            <p class="results-subtitle">${pct >= 70 ? 'Excellent work! The Practical Coding Assignment is now unlocked.' : 'Review your technical logic below to prepare for the practical lab.'}</p>
+            <p class="results-subtitle">${pct >= 70 ? 'Great work! The Practical Assignment is now unlocked.' : 'Review your knowledge below to prepare for the assignment.'}</p>
         </div>
 
         <div class="result-grid">
@@ -1007,11 +887,11 @@ function showResults() {
 
         <div class="action-buttons">
             <button class="btn-submit" onclick="window.location.href='index.html'" style="background: var(--bg-light); color: var(--primary); border: 2px solid var(--primary); box-shadow: none;">← Return to Dashboard</button>
-            <button class="btn-submit" onclick="window.location.href='int_assignment.html'">💻 Proceed to Coding Assignment →</button>
+            <button class="btn-submit" onclick="window.location.href='int_assignment.html'">💻 Proceed to Assignment →</button>
         </div>
 
         <div class="review-section">
-            <h3>📋 Review Your Logic</h3>
+            <h3>📋 Review Your Answers</h3>
             ${QS.map((q, i) => {
                 const ua = answered[i];
                 const ok = ua === q.ans;
@@ -1022,10 +902,9 @@ function showResults() {
                         <div class="review-qtext">Question ${i + 1}</div>
                     </div>
                     <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-main);">${q.q}</div>
-                    ${q.code ? `<div class="code-block" style="margin-bottom:12px; margin-top:0">${q.code}</div>` : ''}
                     <div class="review-item">Your Answer: <strong>${ua !== undefined ? q.opts[ua] : 'Not answered'}</strong></div>
                     ${!ok ? `<div class="review-item correct">✓ Correct: ${q.opts[q.ans]}</div>` : ''}
-                    <div class="exp-box">💡 <strong>Technical Logic:</strong> ${q.exp}</div>
+                    <div class="exp-box">💡 <strong>Explanation:</strong> ${q.exp}</div>
                 </div>`;
             }).join('')}
         </div>

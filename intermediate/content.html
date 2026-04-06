@@ -571,11 +571,15 @@
         <div class="card">
             <h3>📹 Intermediate Lecture: Advanced State & Hooks</h3>
             <div class="video-wrapper">
-                <video controls crossorigin="anonymous">
-                    <source src="https://res.cloudinary.com/dj3shi5ju/video/upload/v1774863371/uemx7jw5jftvmilzpejj.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
+    <iframe 
+        src="https://drive.google.com/file/d/1oq3YSd0p7Dh1EyLPOzkrpLp-64_GMo5f/preview" 
+        width="100%" 
+        height="450" 
+        allow="autoplay; encrypted-media" 
+        allowfullscreen
+        style="border: 2px solid #eee; border-radius: 8px;">
+    </iframe>
+</div>
 
             <div class="learning-objectives">
                 <strong>Learning Objectives</strong>
@@ -595,7 +599,7 @@
             <div class="pdf-container">
                 <div class="pdf-loading">Loading slides...</div>
                 <iframe 
-                    src="https://drive.google.com/file/d/1b0oSZU1GC4-IVIhO78amRS0uJxoH7vjM/preview" 
+                    src="https://drive.google.com/file/d/1jEpS1l2ThH-DgHe0rS11GJJx8kpLIfi7/preview" 
                     title="Technical Slides PDF"
                     loading="lazy">
                 </iframe>
@@ -616,7 +620,7 @@
         const preDone = localStorage.getItem('react_int_pre_completed');
         if (!preDone) {
             alert("Please complete the Intermediate Pre-Assessment before accessing these materials.");
-            window.location.href = "int_pre_assessment.html";
+            window.location.href="int_pre_assessment.html";
             return;
         }
     };
@@ -635,16 +639,16 @@
     }
 
     // 3. Completion Tracking
-    function markComplete() {
-        // Set the flag to unlock the Intermediate Post-Assessment (Final Quiz)
-        // Note: Using the updated specific key to match the gatekeeper for post-assessment
-        localStorage.setItem('react_int_content_completed', 'true'); 
-        
-        alert("Intermediate content marked as complete! You have unlocked the Final Quiz.");
-        
-        // Navigate to the Intermediate Post-Assessment
-        window.location.href = 'int_post_assessment.html';
-    }
+   function markComplete() {
+    // 1. Save the completion status
+    localStorage.setItem('react_int_content_completed', 'true'); 
+    
+    // 2. Alert the user
+    alert("Intermediate content marked as complete! You have unlocked the Final Quiz.");
+    
+    // 3. Redirect to the post-assessment
+    window.location.href = 'int_post_assessment.html'; 
+}
 
     // Hide loading message when PDF loads
     document.addEventListener('DOMContentLoaded', () => {
